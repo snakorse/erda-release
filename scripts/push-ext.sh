@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
+yum install git -y
+
 if [[ -z $ERDA_NAMESPACE ]]; then
 	export ERDA_NAMESPACE="default"
 fi
