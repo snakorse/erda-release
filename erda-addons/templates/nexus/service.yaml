@@ -1,0 +1,18 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ .Values.nexus.name | default "addon-nexus" }}
+  namespace: {{ .Values.namespace | default "erda-system" }}
+spec:
+  ports:
+  - name: {{ .Values.nexus.name | default "addon-nexus" }}-tcp-8081
+    protocol: TCP
+    port: 8081
+  - name: {{ .Values.nexus.name | default "addon-nexus" }}-tcp-5000
+    protocol: TCP
+    port: 5000
+  - name: {{ .Values.nexus.name | default "addon-nexus" }}-tcp-5500
+    protocol: TCP
+    port: 5500
+  selector:
+    dice/addon: {{ .Values.nexus.name | default "addon-nexus" }}

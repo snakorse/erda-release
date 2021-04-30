@@ -1,0 +1,101 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: {{ .Values.nexus.name | default "addon-nexus" }}
+  namespace: {{ .Values.namespace | default "erda-system" }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      dice/addon: {{ .Values.nexus.name | default "addon-nexus" }}
+  template:
+    metadata:
+      labels:
+        dice/addon: {{ .Values.nexus.name | default "addon-nexus" }}
+    spec:
+      volumes:
+        - name: bind1
+          persistentVolumeClaim:
+            claimName: data-{{ .Values.nexus.name | default "addon-nexus" }}-pvc
+        - name: bind2
+          persistentVolumeClaim:
+            claimName: netdata-{{ .Values.nexus.name | default "addon-nexus" }}-pvc
+      containers:
+        - name: {{ .Values.nexus.name | default "addon-nexus" }}
+          image: {{ .Values.image.repository }}/{{ .Values.nexus.name | default "addon-nexus" }}:{{ .Values.nexus.version }}
+          imagePullPolicy: {{ .Values.image.imagePullPolicy }}
+          ports:
+            - containerPort: 8081
+              protocol: TCP
+          env:
+            - name: DICE_ADDON
+              value: {{ .Values.nexus.name | default "addon-nexus" }}
+            - name: INSTALL4J_ADD_VM_PARAMS
+              value: -Xms{{ .Values.nexus.jvm.memory }}m -Xmx{{ .Values.nexus.jvm.memory }}m -XX:MaxDirectMemorySize=4g -Djava.util.prefs.userRoot=/nexus-data/nexus/javaprefs'
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: status.podIP
+            - name: HOST_IP
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: status.hostIP
+          resources:
+            requests:
+              cpu: {{ .Values.nexus.resources.requests.cpu | default "0.1" | quote }}
+              memory: {{ .Values.nexus.resources.requests.memory | default "10Mi" | quote }}
+            limits:
+              cpu: {{ .Values.nexus.resources.limits.cpu |  default "1" | quote }}
+              memory: {{ .Values.nexus.resources.limits.memory | default "6Gi" | quote }}
+          volumeMounts:
+            - name: bind1
+              mountPath: /nexus-data
+            - name: bind2
+              mountPath: /nexus-netdata
+          livenessProbe:
+            exec:
+              command:
+                - '/bin/sh'
+                - '-c'
+                - 'curl http://localhost:8081/service/rest/v1/status/writable'
+            initialDelaySeconds: 30
+            timeoutSeconds: 10
+            periodSeconds: 15
+            successThreshold: 1
+            failureThreshold: 21
+          readinessProbe:
+            exec:
+              command:
+                - '/bin/sh'
+                - '-c'
+                - 'curl http://localhost:8081/service/rest/v1/status/writable'
+            initialDelaySeconds: 30
+            timeoutSeconds: 10
+            periodSeconds: 15
+            successThreshold: 1
+            failureThreshold: 21
+      {{- if .Values.imagePullSecrets }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- end }}
+      {{- if .Values.nodematchExpressions }}
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                {{- range $_, $value := .Values.nodematchExpressions }}
+                  - key: {{ $value.key }}
+                    operator: {{ $value.operator }}
+                {{- end }}
+      {{- end }}
+      tolerations:
+        - operator: Exists
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 100%
+      maxSurge: 0%

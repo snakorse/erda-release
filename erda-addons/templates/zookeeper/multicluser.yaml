@@ -1,0 +1,425 @@
+{{ if ne .Values.size "demo" }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.zookeeper.name | default "addon-zookeeper" }}-i1
+  namespace: {{ .Values.namespace | default "erda-system" }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      dice/addon: {{ .Values.zookeeper.name | default "addon-zookeeper" }}-i1
+  template:
+    metadata:
+      labels:
+        dice/addon: {{ .Values.zookeeper.name | default "addon-zookeeper" }}-i1
+    spec:
+      volumes:
+      - name: bind1
+        persistentVolumeClaim:
+          claimName: data-{{ .Values.zookeeper.name | default "addon-zookeeper" }}-i1-pvc
+      containers:
+      - name: {{ .Values.zookeeper.name | default "addon-zookeeper" }}-i1
+        image:  {{ .Values.image.repository }}/{{ .Values.zookeeper.name | default "addon-zookeeper" }}:{{ .Values.zookeeper.version }}
+        imagePullPolicy: {{ .Values.image.imagePullPolicy }}
+        ports:
+        - containerPort: 2181
+          protocol: TCP
+        - containerPort: 2888
+          protocol: TCP
+        - containerPort: 3888
+          protocol: TCP
+        env:
+        - name: DICE_ADDON
+          value: {{ .Values.zookeeper.name | default "addon-zookeeper" }}-i1
+        - name: ZOO_AUTO_INTERVAL
+          value: '2'
+        - name: ZOO_AUTO_RETAINCOUNT
+          value: '3'
+        - name: ZOO_CONF_DIR
+          value: "/conf"
+        - name: ZOO_DATA_DIR
+          value: "/data"
+        - name: ZOO_DATA_LOG_DIR
+          value: "/datalog"
+        - name: ZOO_INIT_LIMIT
+          value: '5'
+        - name: ZOO_MAX_CLIENT_CNXNS
+          value: '60'
+        - name: ZOO_MY_ID
+          value: '1'
+        - name: ZOO_PORT
+          value: '2181'
+        - name: ZOO_SERVERS
+          value: server.2={{ .Values.zookeeper.name | default "addon-zookeeper" }}-i2.{{ .Values.namespace | default "erda-system" }}.svc.cluster.local:2888:3888 server.3={{ .Values.zookeeper.name | default "addon-zookeeper" }}-i3.{{ .Values.namespace | default "erda-system" }}.svc.cluster.local:2888:3888 server.1=0.0.0.0:2888:3888
+        - name: ZOO_SYNC_LIMIT
+          value: '2'
+        - name: ZOO_TICK_TIME
+          value: '6000'
+        - name: ZOO_USER
+          value: zookeeper
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.podIP
+        - name: HOST_IP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.hostIP
+        resources:
+          requests:
+            cpu: {{ .Values.zookeeper.resources.requests.cpu | default "0.5" | quote }}
+            memory: {{ .Values.zookeeper.resources.requests.memory | default "200Mi" | quote }}
+          limits:
+            cpu: {{ .Values.zookeeper.resources.limits.cpu |  default "1" | quote }}
+            memory: {{ .Values.zookeeper.resources.limits.memory | default "400Mi" | quote }}
+        volumeMounts:
+        - name: bind1
+          mountPath: /data
+        livenessProbe:
+          tcpSocket:
+            port: 2181
+          initialDelaySeconds: 1
+          timeoutSeconds: 10
+          periodSeconds: 15
+          successThreshold: 1
+          failureThreshold: 9
+      {{- if .Values.imagePullSecrets }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- end }}
+      {{- if .Values.nodematchExpressions }}
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                {{- range $_, $value := .Values.nodematchExpressions }}
+                  - key: {{ $value.key }}
+                    operator: {{ $value.operator }}
+                {{- end }}
+      {{- end }}
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 100%
+      maxSurge: 0%
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: {{ .Values.zookeeper.name | default "addon-zookeeper" }}-i2
+  namespace: {{ .Values.namespace | default "erda-system" }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      dice/addon: {{ .Values.zookeeper.name | default "addon-zookeeper" }}-i2
+  template:
+    metadata:
+      labels:
+        dice/addon: {{ .Values.zookeeper.name | default "addon-zookeeper" }}-i2
+    spec:
+      volumes:
+      - name: bind1
+        persistentVolumeClaim:
+          claimName: data-{{ .Values.zookeeper.name | default "addon-zookeeper" }}-i2-pvc
+      containers:
+      - name: {{ .Values.zookeeper.name | default "addon-zookeeper" }}-i2
+        image:  {{ .Values.image.repository }}/{{ .Values.zookeeper.name | default "addon-zookeeper" }}:{{ .Values.zookeeper.version }}
+        imagePullPolicy: {{ .Values.image.imagePullPolicy }}
+        ports:
+        - containerPort: 2181
+          protocol: TCP
+        - containerPort: 2888
+          protocol: TCP
+        - containerPort: 3888
+          protocol: TCP
+        env:
+        - name: DICE_ADDON
+          value: {{ .Values.zookeeper.name | default "addon-zookeeper" }}-i2
+        - name: ZOO_AUTO_INTERVAL
+          value: '2'
+        - name: ZOO_AUTO_RETAINCOUNT
+          value: '3'
+        - name: ZOO_CONF_DIR
+          value: "/conf"
+        - name: ZOO_DATA_DIR
+          value: "/data"
+        - name: ZOO_DATA_LOG_DIR
+          value: "/datalog"
+        - name: ZOO_INIT_LIMIT
+          value: '5'
+        - name: ZOO_MAX_CLIENT_CNXNS
+          value: '60'
+        - name: ZOO_MY_ID
+          value: '2'
+        - name: ZOO_PORT
+          value: '2181'
+        - name: ZOO_SERVERS
+          value: server.1={{ .Values.zookeeper.name | default "addon-zookeeper" }}-i1.{{ .Values.namespace | default "erda-system" }}.svc.cluster.local:2888:3888 server.3={{ .Values.zookeeper.name | default "addon-zookeeper" }}-i3.{{ .Values.namespace | default "erda-system" }}.svc.cluster.local:2888:3888 server.2=0.0.0.0:2888:3888
+        - name: ZOO_SYNC_LIMIT
+          value: '2'
+        - name: ZOO_TICK_TIME
+          value: '6000'
+        - name: ZOO_USER
+          value: zookeeper
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.podIP
+        - name: HOST_IP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.hostIP
+        resources:
+          requests:
+            cpu: {{ .Values.zookeeper.resources.requests.cpu | default "0.5" | quote }}
+            memory: {{ .Values.zookeeper.resources.requests.memory | default "200Mi" | quote }}
+          limits:
+            cpu: {{ .Values.zookeeper.resources.limits.cpu |  default "1" | quote }}
+            memory: {{ .Values.zookeeper.resources.limits.memory | default "400Mi" | quote }}
+        volumeMounts:
+        - name: bind1
+          mountPath: /data
+        livenessProbe:
+          tcpSocket:
+            port: 2181
+          initialDelaySeconds: 1
+          timeoutSeconds: 10
+          periodSeconds: 15
+          successThreshold: 1
+          failureThreshold: 9
+      {{- if .Values.imagePullSecrets }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- end }}
+      {{- if .Values.nodematchExpressions }}
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                {{- range $_, $value := .Values.nodematchExpressions }}
+                  - key: {{ $value.key }}
+                    operator: {{ $value.operator }}
+                {{- end }}
+      {{- end }}
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 100%
+      maxSurge: 0%
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: {{ .Values.zookeeper.name | default "addon-zookeeper" }}-i3
+  namespace: {{ .Values.namespace | default "erda-system" }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      dice/addon: {{ .Values.zookeeper.name | default "addon-zookeeper" }}-i3
+  template:
+    metadata:
+      labels:
+        dice/addon: {{ .Values.zookeeper.name | default "addon-zookeeper" }}-i3
+    spec:
+      volumes:
+      - name: bind1
+        persistentVolumeClaim:
+          claimName: data-{{ .Values.zookeeper.name | default "addon-zookeeper" }}-i3-pvc
+      containers:
+      - name: {{ .Values.zookeeper.name | default "addon-zookeeper" }}-i3
+        image:  {{ .Values.image.repository }}/{{ .Values.zookeeper.name | default "addon-zookeeper" }}:{{ .Values.zookeeper.version }}
+        imagePullPolicy: {{ .Values.image.imagePullPolicy }}
+        ports:
+        - containerPort: 2181
+          protocol: TCP
+        - containerPort: 2888
+          protocol: TCP
+        - containerPort: 3888
+          protocol: TCP
+        env:
+        - name: DICE_ADDON
+          value: {{ .Values.zookeeper.name | default "addon-zookeeper" }}-i3
+        - name: ZOO_AUTO_INTERVAL
+          value: '2'
+        - name: ZOO_AUTO_RETAINCOUNT
+          value: '3'
+        - name: ZOO_CONF_DIR
+          value: "/conf"
+        - name: ZOO_DATA_DIR
+          value: "/data"
+        - name: ZOO_DATA_LOG_DIR
+          value: "/datalog"
+        - name: ZOO_INIT_LIMIT
+          value: '5'
+        - name: ZOO_MAX_CLIENT_CNXNS
+          value: '60'
+        - name: ZOO_MY_ID
+          value: '3'
+        - name: ZOO_PORT
+          value: '2181'
+        - name: ZOO_SERVERS
+          value: server.1={{ .Values.zookeeper.name | default "addon-zookeeper" }}-i1.{{ .Values.namespace | default "erda-system" }}.svc.cluster.local:2888:3888 server.2={{ .Values.zookeeper.name | default "addon-zookeeper" }}-i2.{{ .Values.namespace | default "erda-system" }}.svc.cluster.local:2888:3888 server.3=0.0.0.0:2888:3888
+        - name: ZOO_SYNC_LIMIT
+          value: '2'
+        - name: ZOO_TICK_TIME
+          value: '6000'
+        - name: ZOO_USER
+          value: zookeeper
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.podIP
+        - name: HOST_IP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.hostIP
+        resources:
+          requests:
+            cpu: {{ .Values.zookeeper.resources.requests.cpu | default ".5" | quote }}
+            memory: {{ .Values.zookeeper.resources.requests.memory | default "200Mi" | quote }}
+          limits:
+            cpu: {{ .Values.zookeeper.resources.limits.cpu |  default "1" | quote }}
+            memory: {{ .Values.zookeeper.resources.limits.memory | default "400Mi" | quote }}
+        volumeMounts:
+        - name: bind1
+          mountPath: /data
+        livenessProbe:
+          tcpSocket:
+            port: 2181
+          initialDelaySeconds: 1
+          timeoutSeconds: 10
+          periodSeconds: 15
+          successThreshold: 1
+          failureThreshold: 9
+      {{- if .Values.imagePullSecrets }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- end }}
+      {{- if .Values.nodematchExpressions }}
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                {{- range $_, $value := .Values.nodematchExpressions }}
+                  - key: {{ $value.key }}
+                    operator: {{ $value.operator }}
+                {{- end }}
+      {{- end }}
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 100%
+      maxSurge: 0%
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ .Values.zookeeper.name | default "addon-zookeeper" }}-i1
+  namespace: {{ .Values.namespace | default "erda-system" }}
+spec:
+  ports:
+  - name: {{ default "addon-zookeeper" .Values.zookeeper.name }}-i1-tcp-2181
+    protocol: TCP
+    port: 2181
+  - name: {{ default "addon-zookeeper" .Values.zookeeper.name }}-i1-tcp-2888
+    protocol: TCP
+    port: 2888
+  - name: {{ default "addon-zookeeper" .Values.zookeeper.name }}-i1-tcp-3888
+    protocol: TCP
+    port: 3888
+  selector:
+    dice/addon: {{ default "addon-zookeeper" .Values.zookeeper.name }}-i1
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ .Values.zookeeper.name | default "addon-zookeeper" }}-i2
+  namespace: {{ .Values.namespace | default "erda-system" }}
+spec:
+  ports:
+  - name: {{ default "addon-zookeeper" .Values.zookeeper.name }}-i2-tcp-2181
+    protocol: TCP
+    port: 2181
+  - name: {{ default "addon-zookeeper" .Values.zookeeper.name }}-i2-tcp-2888
+    protocol: TCP
+    port: 2888
+  - name: {{ default "addon-zookeeper" .Values.zookeeper.name }}-i2-tcp-3888
+    protocol: TCP
+    port: 3888
+  selector:
+    dice/addon: {{ default "addon-zookeeper" .Values.zookeeper.name }}-i2
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ .Values.zookeeper.name | default "addon-zookeeper" }}-i3
+  namespace: {{ .Values.namespace | default "erda-system" }}
+spec:
+  ports:
+  - name: {{ default "addon-zookeeper" .Values.zookeeper.name }}-i3-tcp-2181
+    protocol: TCP
+    port: 2181
+  - name: {{ default "addon-zookeeper" .Values.zookeeper.name }}-i3-tcp-2888
+    protocol: TCP
+    port: 2888
+  - name: {{ default "addon-zookeeper" .Values.zookeeper.name }}-i3-tcp-3888
+    protocol: TCP
+    port: 3888
+  selector:
+    dice/addon: {{ default "addon-zookeeper" .Values.zookeeper.name }}-i3
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: data-{{ .Values.zookeeper.name | default "addon-zookeeper" }}-i1-pvc
+  namespace: {{ .Values.namespace | default "erda-system" }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Ti
+  storageClassName: {{ .Values.storageclass.local | default "erda-local-volume" }}
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: data-{{ .Values.zookeeper.name | default "addon-zookeeper" }}-i2-pvc
+  namespace: {{ .Values.namespace | default "erda-system" }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Ti
+  storageClassName: {{ .Values.storageclass.local | default "erda-local-volume" }}
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: data-{{ .Values.zookeeper.name | default "addon-zookeeper" }}-i3-pvc
+  namespace: {{ .Values.namespace | default "erda-system" }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Ti
+  storageClassName: {{ .Values.storageclass.local | default "erda-local-volume" }}
+{{ end }}

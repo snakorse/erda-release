@@ -1,0 +1,12 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ .Values.sonar.name | default "addon-sonar" }}
+  namespace: {{ .Values.namespace | default "erda-system" }}
+spec:
+  ports:
+  - name: {{ .Values.sonar.name | default "addon-sonar" }}-tcp-9000
+    protocol: TCP
+    port: 9000
+  selector:
+    dice/addon: {{ .Values.sonar.name | default "addon-sonar" }}

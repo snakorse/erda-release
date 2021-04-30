@@ -1,0 +1,157 @@
+imagePullSecrets: [ name: aliyun-registry ]
+
+namespace: default
+
+size: demo
+
+image:
+  repository: registry.cn-hangzhou.aliyuncs.com/dice-third-party
+  imagePullPolicy: IfNotPresent
+
+storageclass:
+  local: dice-local-volume
+  nfs: dice-nfs-volume
+
+#nodematchExpressions:
+# - key: beta.kubernetes.io/arch
+#   operator: Exists
+
+kafka:
+  name: addon-kafka
+  version: 1.1.0-20210323-be01a9b
+  resources:
+    requests:
+      cpu:
+      memory:
+    limits:
+      cpu:
+      memory:
+  replicas: 1
+  java:
+    heapmemory: "2048"
+   
+
+zookeeper:
+  name: addon-zookeeper
+  version: 3.4.13-monitor
+  resources:
+    requests:
+      cpu:
+      memory:
+    limits:
+      cpu:
+      memory:
+
+redisFailover:
+  name: addon-redis
+  version: 3.2.12
+  secret: aUVWSUk2TFk2RWJyYzRIWA==
+  redis:
+    replicas: 1
+    resources:
+      requests:
+        cpu:
+        memory:
+      limits:
+        cpu:
+        memory:
+  sentinel:
+    replicas: 1
+    resources:
+      requests:
+        cpu:
+        memory:
+      limits:
+        cpu:
+        memory:
+
+cassandra:
+  name: addon-cassandra
+  version: 3.11.10
+  imagePullSecret:
+    name: aliyun-registry
+  replicas: 1
+  resources:
+    requests:
+      cpu:
+      memory:
+    limits:
+      cpu:
+      memory:
+
+kms:
+  name: addon-kms
+  version: 20200608-f11445f776ba50e1f947096f57956a3f0333ab11
+  replicas: 1
+  resources:
+    requests:
+      cpu:
+      memory:
+    limits:
+      cpu:
+      memory:
+  etcdEndpoints: https://erda-etcd.erda-system.svc.cluster.local:2379
+
+nexus:
+  name: addon-nexus
+  version: 3.29.1
+  username: admin
+  password: 02HLT5X0wb999sM0JuOOFrT9M3Bqjs
+  ingressHost: nexus.erda-demo.erda.io
+  jvm:
+    memory: "3072"
+  resources:
+    requests:
+      cpu:
+      memory:
+    limits:
+      cpu:
+      memory:
+ingress:
+  replicas: 3
+
+sonar:
+  name: addon-sonar
+  version: 8.4.2
+  token: LY9DepZ7iDUsyH8TFoDR85ok7y2nw1
+  password: 78tE846484lQQFUwY51h0Yr96ZQ063
+  ingressHost: sonar.erda-demo.erda.io
+  resources:
+    requests:
+      cpu:
+      memory:
+    limits:
+      cpu:
+      memory:
+
+registry:
+  name: addon-registry
+  version: 2.7.1
+  resources:
+    requests:
+      cpu:
+      memory:
+    limits:
+      cpu:
+      memory:
+  hostNetwork: enable
+  hostURL: 10.0.7.83:5000
+  nodematchExpressions: [{ key: kubernetes.io/hostname, operator: In, values: [cn-hangzhou.10.0.7.83] }]
+
+elasticsearch:
+  name: addon-elasticsearch
+  replicas: 1
+  version: 6.2.4
+  resources:
+    requests:
+      cpu:
+      memory:
+    limits:
+      cpu:
+      memory:
+
+mysql:
+  name: erda-mysql
+  user: erda
+  database: erda-demo
+  password: password

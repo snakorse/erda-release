@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: data-{{ .Values.elasticsearch.name | default "addon-elasticsearch" }}
+  namespace: {{ .Values.namespace | default "erda-system" }}
+spec:
+  storageClassName: {{ .Values.storageclass.local | default "erda-local-volume" }}
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Gi

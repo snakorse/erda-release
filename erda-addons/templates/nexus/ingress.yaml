@@ -1,0 +1,15 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: {{ .Values.nexus.name | default "addon-nexus" }}
+  namespace: {{ .Values.namespace | default "erda-system" }}
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+spec:
+  rules:
+    - host: {{ .Values.nexus.ingressHost }}
+      http:
+        paths:
+          - backend:
+              serviceName: {{ .Values.nexus.name | default "addon-nexus" }}
+              servicePort: 8081
