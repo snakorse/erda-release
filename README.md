@@ -113,6 +113,6 @@ The erda release installer  pass the test on following software version:
 	```shell
 	for i in `kubectl get nodes | grep -v NAME | awk '{print $1}'`;
 	do
-		kubectl label node $i dice/<orgname>=true --overwrite
+		kubectl label node $i dice/org-<orgname>=true --overwrite
 	done
 	```
