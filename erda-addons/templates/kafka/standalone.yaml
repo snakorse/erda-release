@@ -1,0 +1,163 @@
+{{- if eq .Values.size "demo" }}
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: {{ .Values.kafka.name | default "addon-kafka" }}
+  namespace: {{ .Values.namespace | default "erda-system" }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      dice/addon: {{ .Values.kafka.name | default "addon-kafka" }}
+  template:
+    metadata:
+      labels:
+        dice/addon: {{ .Values.kafka.name | default "addon-kafka" }}
+    spec:
+      volumes:
+      - name: bind1
+        persistentVolumeClaim:
+          claimName: data-{{ .Values.kafka.name | default "addon-kafka" }}-pvc
+      containers:
+      - name: {{ .Values.kafka.name | default "addon-kafka" }}
+        image: {{ .Values.image.repository }}/{{ .Values.kafka.name | default "addon-kafka" }}:{{ .Values.kafka.version }}
+        imagePullPolicy: {{ .Values.image.imagePullPolicy }}
+        ports:
+        - containerPort: 9092
+          protocol: TCP
+        - containerPort: 9988
+          protocol: TCP
+        - containerPort: 8778
+          protocol: TCP
+        env:
+        - name: DICE_PLATFORM_ADDON
+          value: {{ .Values.kafka.name | default "addon-kafka" }}
+        - name: KAFKA_ADVERTISED_HOST_NAME
+          value: {{ .Values.kafka.name | default "addon-kafka" }}.{{ .Values.namespace }}.svc.cluster.local
+        - name: KAFKA_ADVERTISED_PORT
+          value: '9092'
+        - name: KAFKA_DEFAULT_REPLICATION_FACTOR
+          value: '1'
+        - name: KAFKA_DELETE_TOPIC_ENABLE
+          value: 'true'
+        - name: KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS
+          value: '10000'
+        - name: KAFKA_LOG_CLEANER_ENABLE
+          value: 'true'
+        - name: KAFKA_LOG_DIRS
+          value: "/data"
+        - name: KAFKA_LOG_RETENTION_CHECK_INTERVAL_MS
+          value: '60000'
+        - name: KAFKA_LOG_RETENTION_HOURS
+          value: '2'
+        - name: KAFKA_LOG_SEGMENT_BYTES
+          value: '536870912'
+        - name: KAFKA_MESSAGE_MAX_BYTES
+          value: '20000000'
+        - name: KAFKA_NUM_PARTITIONS
+          value: '9'
+        - name: KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR
+          value: '1'
+        - name: KAFKA_REBALANCE_BACKOFF_MS
+          value: '2000'
+        - name: KAFKA_REBALANCE_MAX_RETRIES
+          value: '10'
+        - name: KAFKA_REPLICA_FETCH_MAX_BYTES
+          value: '20000000'
+        - name: KAFKA_ZOOKEEPER_CONNECT
+          value:  {{ .Values.zookeeper.name }}.{{ .Values.namespace }}.svc.cluster.local:2181
+        - name: KAFKA_ZOOKEEPER_CONNECTION_TIMEOUT_MS
+          value: '10000'
+        - name: KAFKA_ZOOKEEPER_SESSION_TIMEOUT_MS
+          value: '5000'
+        - name: JMX_PORT
+          value: '9988'
+        - name: KAFKA_JMX_OPTS
+          value: '-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9988 -javaagent:/opt/kafka/agent/jolokia-jvm-1.6.2-agent.jar=port=8778,host=0.0.0.0'
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.podIP
+        - name: HOST_IP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.hostIP
+        resources:
+          requests:
+            cpu: {{ .Values.kafka.resources.requests.cpu | default "0.1" | quote }}
+            memory: {{ .Values.kafka.resources.requests.memory | default "10Mi" | quote }}
+          limits:
+            cpu: {{ .Values.kafka.resources.limits.cpu |  default "1" | quote }}
+            memory: {{ .Values.kafka.resources.limits.memory | default "1024Mi" | quote }}
+        volumeMounts:
+        - name: bind1
+          mountPath: /data
+        livenessProbe:
+          tcpSocket:
+            port: 9092
+          initialDelaySeconds: 1
+          timeoutSeconds: 10
+          periodSeconds: 45
+          successThreshold: 1
+          failureThreshold: 9
+      {{- if .Values.imagePullSecrets }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- end }}
+      {{- if .Values.nodematchExpressions }}
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                {{- range $_, $value := .Values.nodematchExpressions }}
+                  - key: {{ $value.key }}
+                    operator: {{ $value.operator }}
+                {{- end }}
+      {{- end }}
+      tolerations:
+      - operator: Exists
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 100%
+      maxSurge: 0%
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ .Values.kafka.name | default "addon-kafka" }}
+  namespace: {{ .Values.namespace | default "erda-system" }}
+spec:
+  clusterIP: None
+  ports:
+  - name: {{ .Values.kafka.name | default "addon-kafka" }}-tcp-9092
+    protocol: TCP
+    port: 9092
+  - name: {{ .Values.kafka.name | default "addon-kafka" }}-tcp-9988
+    protocol: TCP
+    port: 9988
+  - name: {{ .Values.kafka.name | default "addon-kafka" }}-tcp-8778
+    protocol: TCP
+    port: 8778
+  selector:
+    dice/addon: {{ .Values.kafka.name | default "addon-kafka" }}
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: data-{{ .Values.kafka.name | default "addon-kafka" }}-pvc
+  namespace: {{ .Values.namespace | default "erda-system" }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Gi
+  storageClassName: {{ .Values.storageclass.local | default "erda-local-volume" }}
+{{- end }}

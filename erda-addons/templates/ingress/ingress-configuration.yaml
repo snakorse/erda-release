@@ -1,0 +1,204 @@
+---
+data:
+  ssl-redirect: "false"
+  client-body-buffer-size: "4k"
+  client-header-buffer-size: "4k"
+  disable-ipv6-dns: "true"
+  enable-brotli: "true"
+  enable-multi-accept: "false"
+  hsts: "false"
+  hsts-include-subdomains: "false"
+  http-redirect-code: "307"
+  location-snippet: |
+    if ($server_name = "_") {
+           return 404 "backend server not found";
+    }
+  http-snippet: |
+    proxy_hide_header X-Powered-By;
+    proxy_hide_header Server;
+    map $scheme-$request_method  $need_redirect_https {
+        http-OPTIONS 0;
+        ~^https-  0;
+        ~^http-   1;
+    }
+    map $http_upgrade $connection_upgrade {
+        default upgrade;
+        ''      close;
+    }
+    map $http_portal_dest $real_portal_dest {
+        default           $http_portal_dest;
+        "master.mesos"    $http_portal_src;
+    }
+    proxy_http_version 1.1;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $http_x_real_ip;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection $connection_upgrade;
+    map $http_x_portal_sse     $netportal_sse {
+        ""                     $http_portal_sse;
+        default                $http_x_portal_sse;
+    }
+    map $http_x_portal_websocket     $netportal_websocket {
+        ""                     $http_portal_websocket;
+        default                $http_x_portal_websocket;
+    }
+    map $http_x_portal_dest                     $enable_ssl {
+        "kubernetes.default.svc.cluster.local"  on;
+        "~:443$"                                on;
+        default                                 "";
+    }
+    map $enable_ssl:$netportal_sse $enable_sse {
+        "on:on" "ssl";
+        ":on" "on";
+        default "";
+    }
+    map $enable_ssl:$netportal_websocket $enable_ws {
+        "on:on" "ssl";
+        ":on" "on";
+        default "";
+    }
+    server {
+        listen 443 ssl;
+        server_name netportal.terminus.io;
+
+        ssl_session_cache shared:netportal:1m;
+        ssl_session_timeout 10m;
+        ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+        ssl_ciphers HIGH:!aNULL:!MD5;
+        ssl_prefer_server_ciphers on;
+
+        ssl_verify_client on;
+        ssl_certificate /etc/nginx/netportal-edge/server.crt;
+        ssl_certificate_key /etc/nginx/netportal-edge/server.key;
+        ssl_client_certificate /etc/nginx/netportal-edge/ca.crt;
+
+        if ($enable_sse = "on") {
+            rewrite ^/(.*)$ /sse/$1 last;
+        }
+
+        if ($enable_ws = "on") {
+            rewrite ^/(.*)$ /websocket/$1 last;
+        }
+
+        if ($enable_sse = "ssl") {
+            rewrite ^/(.*)$ /ssl_sse/$1 last;
+        }
+
+        if ($enable_ws = "ssl") {
+            rewrite ^/(.*)$ /ssl_websocket/$1 last;
+        }
+
+        if ($enable_ssl = "on") {
+            rewrite ^/(.*)$ /ssl/$1 last;
+        }
+
+        client_max_body_size 0;
+        # remove legacy headers
+        more_clear_input_headers Portal-Host Portal-Dest Portal-SSE Portal-Websocket;
+        location / {
+            proxy_set_header X-Real-IP $http_x_real_ip;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header Host $http_x_portal_dest;
+            proxy_pass http://$http_x_portal_dest;
+        }
+
+        location /sse {
+            proxy_set_header X-Real-IP $http_x_real_ip;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            rewrite ^/sse/(.*)$ /$1 break;
+            proxy_pass http://$http_x_portal_dest$request_uri;
+            proxy_http_version 1.1;
+            proxy_set_header Connection "";
+            proxy_set_header Host $http_x_portal_dest;
+            proxy_buffering off;
+            proxy_cache off;
+            chunked_transfer_encoding off;
+        }
+
+        location /websocket {
+            proxy_set_header X-Real-IP $http_x_real_ip;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            rewrite ^/websocket/(.*)$ /$1 break;
+            proxy_pass http://$http_x_portal_dest$request_uri;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection $connection_upgrade;
+            proxy_set_header Host $http_x_portal_dest;
+        }
+        location /ssl {
+            proxy_ssl_server_name on;
+            proxy_ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+            proxy_ssl_ciphers HIGH:!aNULL:!MD5;
+            proxy_ssl_certificate /etc/nginx/netportal-admin/client.crt;
+            proxy_ssl_certificate_key /etc/nginx/netportal-admin/client.key;
+            proxy_ssl_session_reuse on;
+            proxy_set_header X-Real-IP $http_x_real_ip;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            rewrite ^/ssl/(.*)$ /$1 break;
+            proxy_set_header Host $http_x_portal_dest;
+            proxy_pass https://$http_x_portal_dest$request_uri;
+        }
+
+        location /ssl_sse {
+            proxy_ssl_server_name on;
+            proxy_ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+            proxy_ssl_ciphers HIGH:!aNULL:!MD5;
+            proxy_ssl_certificate /etc/nginx/netportal-admin/client.crt;
+            proxy_ssl_certificate_key /etc/nginx/netportal-admin/client.key;
+            proxy_ssl_session_reuse on;
+            proxy_set_header X-Real-IP $http_x_real_ip;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            rewrite ^/ssl_sse/(.*)$ /$1 break;
+            proxy_pass https://$http_x_portal_dest$request_uri;
+            proxy_http_version 1.1;
+            proxy_set_header Connection "";
+            proxy_set_header Host $http_x_portal_dest;
+            proxy_buffering off;
+            proxy_cache off;
+            chunked_transfer_encoding off;
+        }
+
+        location /ssl_websocket {
+            proxy_ssl_server_name on;
+            proxy_ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+            proxy_ssl_ciphers HIGH:!aNULL:!MD5;
+            proxy_ssl_certificate /etc/nginx/netportal-admin/client.crt;
+            proxy_ssl_certificate_key /etc/nginx/netportal-admin/client.key;
+            proxy_ssl_session_reuse on;
+            proxy_set_header X-Real-IP $http_x_real_ip;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            rewrite ^/ssl_websocket/(.*)$ /$1 break;
+            proxy_pass https://$http_x_portal_dest$request_uri;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection $connection_upgrade;
+            proxy_set_header Host $http_x_portal_dest;
+        }
+    }
+  large-client-header-buffers: "4 32k"
+  log-format-upstream: "[$time_local]\t$http_x_forwarded_for\t$remote_addr\t$scheme\t$host\t$request\t$status\t$request_time\t$request_length\t$body_bytes_sent\t$http_referer\t$http_user_agent\t$ssl_protocol\t$ssl_server_name\t$ssl_cipher\t$upstream_addr\t$upstream_status\t$upstream_response_time\t$upstream_response_length\t$connection\t$connection_requests\t$req_id"
+  max-worker-open-files: "100000"
+  proxy-body-size: "100m"
+  proxy-buffer-size: "256k"
+  proxy-buffering: "on"
+  reuse-port: "false"
+  server-name-hash-max-size: "4096"
+  server-tokens: "false"
+  ssl-protocols: "TLSv1 TLSv1.1 TLSv1.2"
+  ssl-session-tickets: "false"
+  worker-processes: "8"
+  worker-shutdown-timeout: "60s"
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: nginx-configuration
+  namespace: kube-system
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx

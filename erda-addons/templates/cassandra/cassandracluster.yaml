@@ -1,0 +1,44 @@
+apiVersion: "db.orange.com/v1alpha1"
+kind: "CassandraCluster"
+metadata:
+  name: {{ .Values.cassandra.name | default "addon-cassandra" }}
+  namespace: {{ .Values.namespace | default "erda-system" }}
+  labels:
+    cluster: k8s.kaas
+spec:
+  cassandraImage: {{ .Values.image.repository }}/{{ .Values.cassandra.name | default "addon-cassandra" }}:{{ .Values.cassandra.version }}
+  bootstrapImage: registry.cn-hangzhou.aliyuncs.com/dice-third-party/cassandra-bootstrap:0.1.8
+  configMapName: cassandra-configmap-v1
+  imagepullpolicy: {{ .Values.image.imagePullPolicy }}
+  {{- if .Values.cassandra.imagePullSecret }}
+  {{- with .Values.cassandra.imagePullSecrets }}
+  imagePullSecret:
+    {{- toYaml . | nindent 8 }}
+  {{- end }}
+  {{- end }}
+  dataStorageClass: {{ .Values.storageclass.local | default "erda-local-volume" }}
+  dataCapacity: {{ .Values.cassandra.capacity | default "100Gi" }}
+  hardAntiAffinity: false           # Do we ensure only 1 cassandra on each node ?
+  deletePVC: true
+  autoPilot: false
+  gcStdout: true
+  autoUpdateSeedList: false
+  maxPodUnavailable: 1
+  runAsUser: 999
+  backRestSidecar:
+    image: registry.cn-hangzhou.aliyuncs.com/dice-third-party/instaclustr-icarus:1.0.9
+  resources:
+    requests:
+      cpu: {{ .Values.cassandra.resources.requests.cpu | default "0.1" | quote }}
+      memory: {{ .Values.cassandra.resources.requests.memory | default "100Mi" }}
+    limits:
+      cpu: {{ .Values.cassandra.resources.limits.cpu | default "1" | quote }}
+      memory: {{ .Values.cassandra.resources.limits.memory | default "2Gi" }}
+  topology:
+    dc:
+    - name: dc1
+      nodesPerRacks: 1
+      {{- with .Values.cassandra.rack }}
+      rack:
+      {{- toYaml . | nindent 8 }}
+      {{- end }}

@@ -1,0 +1,72 @@
+imagePullSecrets: [name: aliyun-registry]
+
+namespace: default
+
+image:
+  repository: registry.cn-hangzhou.aliyuncs.com/dice-third-party
+  imagePullPolicy: IfNotPresent
+
+redis:
+  name: redis-operator
+  version: 3.2.12
+  resources:
+    requests:
+      cpu:
+      memory:
+    limits:
+      cpu:
+      memory:
+
+cassandra:
+  name: cassandra-operator
+  version: v1.1.3-release
+  imagePullSecret:
+    name: aliyun-registry
+  resources:
+    requests:
+      cpu:
+      memory:
+    limits:
+      cpu:
+      memory:
+
+elasticsearch:
+  name: elasticsearch-operator
+  version: 1.0.1
+
+erda:
+  name: erda-operator
+  version: 20210427-3d25066e886e35c5b4b7269fc9145f4ca4a02434
+
+configmap:
+  size: demo
+  clustername: erda-demo
+  domain: erda-demo.erda.io
+  protocol: http
+
+  ssh:
+    user: root
+    password: ""
+
+  kubernetes:
+    version: 1.18.8
+    master: 10.0.7.83:6443
+    mastervip: 192.168.0.1:443
+    lb:
+
+volumeProvisoner:
+  name: volume-provisioner
+  version: 4.0-20210416-1a3758f
+  provisioner:
+    local: dice/local-volume
+    nfs: dice/netdata-volume
+  storageclass:
+    local: dice-local-volume
+    nfs: dice-nfs-volume
+  resources:
+    requests:
+      cpu:
+      memory:
+    limits:
+      cpu:
+      memory: 

@@ -1,0 +1,3 @@
+FROM registry.cn-hangzhou.aliyuncs.com/dice-third-party/mysql:5.7.34 
+COPY ./my.cnf /etc/my.cnf
+

@@ -1,0 +1,25 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: data-{{ .Values.nexus.name | default "addon-nexus" }}-pvc
+  namespace: {{ .Values.namespace | default "erda-system" }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Gi
+  storageClassName: {{ .Values.storageclass.local | default "erda-local-volume" }}
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: netdata-{{ .Values.nexus.name | default "addon-nexus" }}-pvc
+  namespace: {{ .Values.namespace | default "erda-system" }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Gi
+  storageClassName: {{ .Values.storageclass.local | default "erda-local-volume" }}

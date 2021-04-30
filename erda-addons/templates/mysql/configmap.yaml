@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-initdb-config
+data:
+  initdb.sql: |
+    create user '{{ .Values.mysql.user }}dbmigration'@'%' identified by '{{ .Values.mysql.password }}';
+    create user '{{ .Values.mysql.user }}'@'%' identified by '{{ .Values.mysql.password }}';
+    grant all privileges on *.* to '{{ .Values.mysql.user }}dbmigration'@'%' WITH GRANT OPTION;
+    grant all privileges on *.* to '{{ .Values.mysql.user }}'@'%' WITH GRANT OPTION;
+    flush privileges;

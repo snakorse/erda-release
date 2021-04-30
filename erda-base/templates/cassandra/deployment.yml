@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.cassandra.name | default "cassandra-operator" }}
+  namespace: {{ .Values.namespace | default "erda-system" }}
+  labels:
+    app:  {{ .Values.cassandra.name | default "cassandra-operator" }}
+    operator: cassandra
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name:  {{ .Values.cassandra.name | default "cassandra-operator" }}
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 100%
+      maxSurge: 0%
+  template:
+    metadata:
+      labels:
+        name:  {{ .Values.cassandra.name | default "cassandra-operator" }}
+        app:  {{ .Values.cassandra.name | default "cassandra-operator" }}
+        operator: cassandra
+    spec:
+      {{- if .Values.imagePullSecrets }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- end }}
+      serviceAccountName:  {{ .Values.cassandra.name | default "cassandra-operator" }}
+      securityContext:
+        runAsUser: 1000
+      tolerations:
+        - operator: Exists
+      containers:
+      - name:  {{ .Values.cassandra.name | default "cassandra-operator" }}
+        image: {{ .Values.image.repository }}/{{ .Values.cassandra.name | default "cassandra-operator" }}:{{ .Values.cassandra.version}}
+        imagePullPolicy: {{ .Values.image.imagePullPolicy }}
+        command:
+        - casskop
+        readinessProbe:
+          exec:
+            command:
+            - /health
+          initialDelaySeconds: 4
+          periodSeconds: 10
+          failureThreshold: 1
+        resources:
+          requests:
+            cpu: 10m
+            memory: 10Mi
+          limits:
+            cpu: 1
+            memory: 512Mi
+        env:
+        - name: WATCH_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: OPERATOR_NAME
+          value:  {{ .Values.cassandra.name | default "cassandra-operator" | quote }}
+        - name: LOG_LEVEL
+          value: Debug
