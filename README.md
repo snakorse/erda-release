@@ -1,45 +1,59 @@
-# erda-release
+# Erda Installation Tools
 
-The erda release installer  pass the test on following software version:
+We have successfully installed Erda in the following software:
 
 - Kubernetes 1.18.8
 - Docker 19.03.5
 - CentOS 7.9
+- Helm 3.4.2
+
+
 
 ## Quickly Started
 
-### Prepared
+### Prerequisites
 
 - Kuberentes 1.18.8, We recommand you use ACK Pro ( AliCloud Kubernetes Pro)
-  - The minimal node resource is 4 CPU 16G Memory
-  - At least 4 Node (1 Master and 3 Worker)
-  - 200G Storage on `/`
-  - **Don't Install the ingress**
+  - Each node needs at least 4 core CPU, 16G memory
+  - At least 4 Nodes (1 Master and 3 Workers)
+  - At least 200G storage in the `/`
+  - Need an SLB
+  - **Don't Install the ingress component**
 - Docker 19.03.5
-- CentOS 7
-- Helm 3
+- CentOS 7 +
+- Helm 3.4 +
+
+
 
 ### Step
 
-1. git clone this repo on your machine
+1. Git clone the repo on your machine
 
    > git clone https://github.com/erda-project/erda-release.git
 
-2. change directory to the erda-release folder
+
+2. Change directory to the erda-release folder
 
    > cd erda-release
-  
-3. package the tar ball
+
+
+3. Package the tarball
 
    > bash scripts/build_package.sh
 
-4. copy the tar ball to your  **Kubernetes Master** node and make sure the **kubeconfig** file on the ~/.kube/config, then prepare the following enviroment variables on the **Kubernetes Master Node**.
+   
 
-   >  scp package/erda-release.tar.gz root@<hostip>:/root
+4. Copy the tarball to your  **Kubernetes Master** node and make sure the **kubeconfig** file on the ~/.kube/config.
+
+   > scp package/erda-release.tar.gz root@<hostip>:/root
 
    >  tar -xzvf /root/erda-release.tar.gz
 
    >  cd erda-release
+
+   
+
+    Then prepare the following environment variables on the **Kubernetes Master Node**.
 
    ```shell
    # specify the kuberentes namepsace to install erda components, default  value is `default`.
@@ -55,14 +69,35 @@ The erda release installer  pass the test on following software version:
    export ERDA_NETDATA_ENABLE=enable
    
    # set necessary label of erda to the Kubernetes, `enable` and `disable` supported, default is `enable`
-   export ERDA_LABEL_ENABLE="enable"
+   export ERDA_LABEL_ENABLE=enable
+   
+   # set the network of registry host mode, `host` and `container` supported, default is `container`
+   export ERDA_REGISTRY_NETMODE=host
    ```
+
+   
+
+   **Note:** If you want to use the Erda registry, you need to set the NETMODE to `host` and update the values of  `insecure-registries` in the `/etc/docker/daemon.json` on each node: 
+
+   ```shell
+   ...
+   	"insecure-registries": [
+        "0.0.0.0/0"
+       ],
+   ...
+   ```
+
+   Then restart the docker with `systemctl restart docker`
+
+   
 
 5. Configurate the Kubernetes machine
 
    > bash scripts/prepare.sh
 
-6. Install the erda with helm package
+   
+   
+6. Install the Erda with helm package
 
    ```shell
    # install erda-base
@@ -81,15 +116,21 @@ The erda release installer  pass the test on following software version:
    kubectl get pods
    ```
 
-7. set admin username and password to push the erda extensions
-  ```shell
-  export ERDA_ADMIN_USERNAME=
-  export ERDA_ADMIN_PASSWORD=
-  
-  bash scripts/push-ext.sh
-  ```
 
-8. set `/etc/hosts` with the following urls on **your browser local machine**
+
+7. set admin username and password to push the Erda extensions
+
+   ```shell
+   export ERDA_ADMIN_USERNAME=
+   export ERDA_ADMIN_PASSWORD=
+   
+   bash scripts/push-ext.sh
+   ```
+   
+   
+
+
+8. Write the following URLs to `/etc/hosts` on the **machine where the browser is located**, replace the <SLB> to the real slb ip
    ```
    <SLB_IP> harbor.erda.cloud
    <SLB_IP> nexus.erda-demo.erda.io
@@ -102,17 +143,21 @@ The erda release installer  pass the test on following software version:
    <SLB_IP> hepa.erda-demo.erda.io
    <SLB_IP> openapi.erda-demo.erda.io
    <SLB_IP> uc.erda-demo.erda.io
-   <SLB_IP> erda-test-org.erda-demo.erda.io
+   <SLB_IP> <orgname>-org.erda-demo.erda.io
    <SLB_IP> test-java.erda-demo.erda.io
    ```
 
-9. Visit the url `http://dice.erda-demo.erda.io` on your browser
-	- open slb 80, 443 and 6443 ports
 
-10. set your kuberentes nodes label with your create orgname
-	```shell
-	for i in `kubectl get nodes | grep -v NAME | awk '{print $1}'`;
-	do
-		kubectl label node $i dice/org-<orgname>=true --overwrite
-	done
-	```
+9. Visit the URL `http://dice.erda-demo.erda.io` on your browser machine which set the `/etc/hosts`
+   - Note that you need to open the 80, 443 and 6443 ports of SLB
+
+
+
+
+10. set your Kubernetes nodes label with your created organization name
+    ```shell
+    for i in `kubectl get nodes | grep -v NAME | awk '{print $1}'`;
+    do
+    	kubectl label node $i dice/org-<orgname>=true --overwrite
+    done
+    ```

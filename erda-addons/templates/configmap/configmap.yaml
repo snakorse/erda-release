@@ -21,7 +21,7 @@ data:
   REDIS_MASTER_NAME: mymaster
   REDIS_PASSWORD: iEVII6LY6Ebrc4HX
   REDIS_SENTINELS_ADDR: rfs-{{ .Values.redisFailover.name | default "addon-redis" }}.{{ .Values.namespace | default "erda-system"}}.svc.cluster.local:26379
-  {{- if eq .Values.registry.hostNetwork "enable" }}
+  {{- if eq .Values.registry.networkMode "host" }}
   REGISTRY_ADDR: {{ .Values.registry.hostURL }}
   {{- else }}
   REGISTRY_ADDR: {{ .Values.registry.name | default "addon-registry" }}.{{ .Values.namespace | default "erda-system" }}.svc.cluster.local:5000
