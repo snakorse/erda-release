@@ -64,11 +64,11 @@ export ETCD_CLIENT_KEY=`cat ${ssl_dir}/etcd-client-key.pem | base64 | tr -d "\n"
 export ERDA_REGISTRY_HOSTURL=""
 export ERDA_REGISTRY_HOSTNAME=""
 
-if [[ $ERDA_REGISTRY_HOSTMODE == "enable" ]]; then
+if [[ $ERDA_REGISTRY_NETMODE == "host" ]]; then
 	export ERDA_REGISTRY_HOSTNAME=`kubectl get nodes | grep -v NAME |head -n 1 |awk '{print $1}'`
 	export ERDA_REGISTRY_HOSTURL=`kubectl get nodes -o wide | grep -v NAME |head -n 1 |awk '{print $6}'`:5000
 else
-	export ERDA_REGISTRY_HOSTMODE="disable"
+	export ERDA_REGISTRY_NETMODE="container"
 fi
 
 

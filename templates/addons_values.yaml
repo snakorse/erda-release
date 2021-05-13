@@ -134,7 +134,7 @@ registry:
     limits:
       cpu:
       memory:
-  hostNetwork: ${ERDA_REGISTRY_HOSTMODE}
+  networkMode: ${ERDA_REGISTRY_NETMODE}
   hostURL: ${ERDA_REGISTRY_HOSTURL}
   nodematchExpressions: [{ key: kubernetes.io/hostname, operator: In, values: [${ERDA_REGISTRY_HOSTNAME}] }]
 
