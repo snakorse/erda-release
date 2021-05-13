@@ -49,15 +49,16 @@ We have successfully installed Erda in the following software:
 1. Copy the tarball to your  **Kubernetes Master** node and make sure the **kubeconfig** file on the ~/.kube/config.
 
    > scp package/erda-release.tar.gz root@<hostip>:/root
-
-   >  tar -xzvf /root/erda-release.tar.gz
-
-   >  cd erda-release
+   
+   > tar -xzvf /root/erda-release.tar.gz
+   
+   > cd erda-release
 
    
-
+   
+   
     Then prepare the following environment variables on the **Kubernetes Master Node**.
-
+   
    ```shell
    # specify the kuberentes namepsace to install erda components, default  value is `default`.
    export ERDA_NAMESPACE=default
@@ -77,23 +78,23 @@ We have successfully installed Erda in the following software:
    # set the network of registry host mode, `host` and `container` supported, default is `container`
    export ERDA_REGISTRY_NETMODE=host
    ```
-
    
-
+   
+   
    **Note:** If you want to use the Erda registry, you need to set the NETMODE to `host` and update the values of  `insecure-registries` in the `/etc/docker/daemon.json` on each node: 
-
+   
    ```shell
    ...
-   	"insecure-registries": [
+       "insecure-registries": [
         "0.0.0.0/0"
        ],
    ...
    ```
-
-   Then restart the docker with `systemctl restart docker`
-
    
-
+   Then restart the docker with `systemctl restart docker`
+   
+   
+   
 2. Configurate the Kubernetes machine
 
    > bash scripts/prepare.sh
@@ -133,7 +134,7 @@ We have successfully installed Erda in the following software:
    
 
 
-5. Write the following URLs to `/etc/hosts` on the **machine where the browser is located**, replace the <IP> to the real host ip
+5. Write the following URLs to `/etc/hosts` on the **machine where the browser is located**, replace the <IP> with IP of the **LB machine**, which will receivers all outside traffic:
    ```
    <IP> harbor.erda.cloud
    <IP> nexus.erda-demo.erda.io
@@ -155,7 +156,7 @@ We have successfully installed Erda in the following software:
 
 6. Visit the URL `http://dice.erda-demo.erda.io` on your browser machine which set the `/etc/hosts`
 
-   - Note that you need to open the 80, 443 and 6443 ports of SLB
+   - Note that you need to open the 80, 443 and 6443 ports of the **LB machine**
 
      
 
