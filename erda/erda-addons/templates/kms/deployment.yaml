@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.kms.name | default "addon-kms" }}
+  namespace: {{ .Values.namespace | default "erda-system" }}
+  labels:
+    app.kubernetes.io/name: kms
+spec:
+  replicas: {{ .Values.kms.replicas | default 1 }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: kms
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: kms
+    spec:
+      tolerations:
+      - operator: Exists
+      {{- if .Values.nodematchExpressions }}
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  {{- range $_, $value := .Values.nodematchExpressions }}
+                    - key: {{ $value.key }}
+                      operator: {{ $value.operator }}
+                  {{- end }}
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app.kubernetes.io/name
+                      operator: In
+                      values:
+                        - kms
+                topologyKey: kubernetes.io/hostname
+      {{- end }}
+      {{- if .Values.imagePullSecrets }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- end }}
+      containers:
+      - name: kms
+        image:  {{ .Values.image.repository }}/{{ .Values.kms.name | default "addon-kms" }}:{{ .Values.kms.version }}
+        imagePullPolicy: {{ .Values.image.imagePullPolicy }}
+        ports:
+        - containerPort: 3082
+        env:
+        - name: ETCD_ENDPOINTS
+          value: https://erda-etcd.{{ .Values.namespace}}.svc.cluster.local:2379
+        resources:
+          requests:
+            cpu: {{ .Values.kms.resources.requests.cpu | default "0.1" | quote }}
+            memory: {{ .Values.kms.resources.requests.memory | default "10Mi" | quote }}
+          limits:
+            cpu: {{ .Values.kms.resources.limits.cpu |  default ".5" | quote }}
+            memory: {{ .Values.kms.resources.limits.memory | default "500Mi" | quote }}
+        livenessProbe:
+          failureThreshold: 9
+          initialDelaySeconds: 1
+          periodSeconds: 15
+          successThreshold: 1
+          tcpSocket:
+            port: 3082
+          timeoutSeconds: 10
+        volumeMounts:
+        - mountPath: /certs/
+          name: etcd-client-secret
+          readOnly: true
+      restartPolicy: Always
+      volumes:
+      - name: etcd-client-secret
+        secret:
+          secretName: etcd-client-secret
+        
+

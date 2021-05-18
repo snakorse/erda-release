@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.cassandraOperator.name | default "cassandra-operator" }}-metrics
+  labels:
+    component: app
+    app: {{ .Values.cassandraOperator.name | default "cassandra-operator" }}-metrics
+spec:
+  selector:
+    app: {{ .Values.cassandraOperator.name | default "cassandra-operator" }}
+  ports:
+  - name: metrics
+    port: 9710
+    protocol: TCP

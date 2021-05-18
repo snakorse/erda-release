@@ -17,11 +17,15 @@
 
 *.DS_Store
 
-package/
+*package
 
-*scripts/ssl
-*scripts/bin
+*/scripts/ssl
+*/scripts/bin
+*/scripts/erda-actions
+*/scripts/erda-addons
+*third_party_package
+*/docs
+*How-to-install-the-Erda.md*
 
-*erda-actions
 
 *aliyun_sc.yaml
