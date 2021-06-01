@@ -1,0 +1,18 @@
+namespace: default
+
+image:
+  repository: erda-registry.cn-hangzhou.cr.aliyuncs.com/erda/
+  imagePullPolicy: IfNotPresent
+  components:
+    init: init-image:1.0.0-20210510-21a3c66
+    erda: erda:1.0.0-20210510-d7dd555
+    erdaUI: erda-ui:1.0.0-20210508-f228247
+    uc: erda-uc:1.0.0-20210425-d4c5a312
+    telegraf: telegraf:1.0.0-20210510-dc02a9d
+    analyzer:
+      error: erda-analyzer-error-insight:1.0.0-20210422-69e9f84
+      metrics: erda-analyzer-metrics:1.0.0-20210422-69e9f84
+      alert: erda-analyzer-alert:1.0.0-20210422-69e9f84
+    filebeat: filebeat:1.0.0-20210422-5b97371
+    tmc: tmc:1.0.0-20210429-b87d98a
+    soldier: soldier:1.0.0-20210426-daef74b

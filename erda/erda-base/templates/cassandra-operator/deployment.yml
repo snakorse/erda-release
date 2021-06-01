@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.cassandraOperator.name | default "cassandra-operator" }}
+  namespace: {{ .Values.namespace | default "erda-system" }}
+  labels:
+    app:  {{ .Values.cassandraOperator.name | default "cassandra-operator" }}
+    operator: {{ .Values.cassandraOperator.name | default "cassandra-operator" }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name:  {{ .Values.cassandraOperator.name | default "cassandra-operator" }}
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 100%
+      maxSurge: 0%
+  template:
+    metadata:
+      labels:
+        name:  {{ .Values.cassandraOperator.name | default "cassandra-operator" }}
+        app:  {{ .Values.cassandraOperator.name | default "cassandra-operator" }}
+        operator: {{ .Values.cassandraOperator.name | default "cassandra-operator" }}
+    spec:
+      {{- if .Values.imagePullSecrets }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- end }}
+      serviceAccountName:  {{ .Values.cassandraOperator.name | default "cassandra-operator" }}
+      securityContext:
+        runAsUser: 1000
+      tolerations:
+        - operator: Exists
+      containers:
+      - name:  {{ .Values.cassandraOperator.name | default "cassandra-operator" }}
+        image: {{ .Values.image.repository }}/{{ .Values.cassandraOperator.name | default "cassandra-operator" }}:{{ .Values.cassandraOperator.version}}
+        imagePullPolicy: {{ .Values.image.imagePullPolicy }}
+        command:
+        - casskop
+        readinessProbe:
+          exec:
+            command:
+            - /health
+          initialDelaySeconds: 4
+          periodSeconds: 10
+          failureThreshold: 1
+        resources:
+          requests:
+            cpu: 10m
+            memory: 10Mi
+          limits:
+            cpu: 1
+            memory: 512Mi
+        env:
+        - name: WATCH_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: OPERATOR_NAME
+          value:  {{ .Values.cassandraOperator.name | default "cassandra-operator" | quote }}
+        - name: LOG_LEVEL
+          value: Debug

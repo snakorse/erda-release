@@ -1,0 +1,12 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ .Values.redisOperator.name }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ .Values.redisOperator.name }}
+subjects:
+- kind: ServiceAccount
+  name: {{ .Values.redisOperator.name }}
+  namespace: {{ .Values.namespace | default "erda-system" }}

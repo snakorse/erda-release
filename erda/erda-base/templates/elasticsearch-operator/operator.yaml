@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.elasticsearchOperator.name | default "elasticsearch-operator" }}
+  namespace: {{ .Values.namespace | default "erda-system" }}
+  labels:
+    control-plane: {{ .Values.elasticsearchOperator.name | default "elasticsearch-operator" }}
+spec:
+  selector:
+    matchLabels:
+      control-plane: {{ .Values.elasticsearchOperator.name | default "elasticsearch-operator" }}
+  template:
+    metadata:
+      labels:
+        control-plane: {{ .Values.elasticsearchOperator.name | default "elasticsearch-operator" }}
+    spec:
+      {{- if .Values.imagePullSecrets }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- end }}
+      serviceAccountName: {{ .Values.elasticsearchOperator.name | default "elasticsearch-operator" }}
+      tolerations:
+        - operator: Exists
+      containers:
+      - image: {{ .Values.image.repository }}/{{ .Values.elasticsearchOperator.name | default "elasticsearch-operator" }}:{{ .Values.elasticsearchOperator.version }}
+        imagePullPolicy:  {{ .Values.image.imagePullPolicy }}
+        name: manager
+        args: ["manager", "--operator-roles", "all", "--log-verbosity=0"]
+        env:
+          - name: OPERATOR_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          - name: WEBHOOK_SECRET
+            value: {{ .Values.elasticsearchOperator.name | default "elasticsearch-operator" }}-cert
+          - name: WEBHOOK_PODS_LABEL
+            value: {{ .Values.elasticsearchOperator.name | default "elasticsearch-operator" }}
+          - name: OPERATOR_IMAGE
+            value: {{ .Values.image.repository }}/{{ .Values.elasticsearchOperator.name | default "elasticsearch-operator" }}:{{ .Values.elasticsearchOperator.version }}
+        resources:
+          limits:
+            cpu: 1
+            memory: 500Mi
+          requests:
+            cpu: 10m
+            memory: 10Mi
+        ports:
+        - containerPort: 9443
+          name: webhook-server
+          protocol: TCP
+        volumeMounts:
+          - mountPath: /tmp/k8s-webhook-server/serving-certs
+            name: cert
+            readOnly: true
+      terminationGracePeriodSeconds: 10
+      volumes:
+        - name: cert
+          secret:
+            defaultMode: 420
+            secretName: {{ .Values.elasticsearchOperator.name | default "elasticsearch-operator" }}-cert

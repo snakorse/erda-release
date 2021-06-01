@@ -1,0 +1,57 @@
+apiVersion: databases.spotahome.com/v1
+kind: RedisFailover
+metadata:
+  name: {{ .Values.redisFailover.name | default "addon-redis" }}
+  namespace: {{ .Values.namespace | default "erda-system" }}
+spec:
+  sentinel:
+    image: {{ .Values.image.repository }}/{{ .Values.redisFailover.name | default "addon-redis" }}:{{ .Values.redisFailover.version }}
+    replicas: {{ .Values.redisFailover.sentinel.repilcas | default 1 }}
+    tolerations:
+      - operator: Exists
+    affinity:
+      nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+            {{- if .Values.nodematchExpressions }}
+            {{- range $_, $value := .Values.nodematchExpressions }}
+              - key: {{ $value.key }}
+                operator: {{ $value.operator }}
+            {{- end }}
+            {{- end }}
+    resources:
+      requests:
+        cpu: {{ .Values.redisFailover.sentinel.resources.requests.cpu | default "0.1" | quote }}
+        memory: {{ .Values.redisFailover.sentinel.resources.requests.memory | default "10Mi" | quote }}
+      limits:
+        cpu: {{ .Values.redisFailover.sentinel.resources.requests.cpu | default ".2" | quote }}
+        memory: {{ .Values.redisFailover.sentinel.resources.limits.memory | default "64Mi" | quote }}
+    customConfig:
+    - "down-after-milliseconds 12000"
+    - "failover-timeout 12000"
+  redis:
+    image: {{ .Values.image.repository }}/{{ .Values.redisFailover.name | default "addon-redis" }}:{{ .Values.redisFailover.version }}
+    replicas: {{ .Values.redisFailover.sentinel.repilcas | default 1 }}
+    tolerations:
+      - operator: Exists
+    affinity:
+      nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+            {{- if .Values.nodematchExpressions }}
+            {{- range $_, $value := .Values.nodematchExpressions }}
+              - key: {{ $value.key }}
+                operator: {{ $value.operator }}
+            {{- end }}
+            {{- end }}
+    resources:
+      requests:
+        cpu: {{ .Values.redisFailover.redis.resources.requests.cpu | default "0.1" | quote }}
+        memory: {{ .Values.redisFailover.redis.resources.requests.memory | default "10Mi" | quote }}
+      limits:
+        cpu: {{ .Values.redisFailover.redis.resources.requests.cpu | default ".3" | quote }}
+        memory: {{ .Values.redisFailover.redis.resources.limits.memory | default "512Mi" | quote }}
+  auth:
+    secretPath: {{ .Values.redisFailover.name | default "addon-redis" }}-auth

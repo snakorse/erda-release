@@ -1,0 +1,45 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: elastic-webhook.k8s.elastic.co
+webhooks:
+  - clientConfig:
+      caBundle: Cg==
+      service:
+        name: {{ .Values.elasticsearchOperator.name | default "elasticsearch-operator" }}
+        namespace: {{ .Values.namespace | default "erda-system" }}
+        path: /validate-elasticsearch-k8s-elastic-co-v1-elasticsearch
+    failurePolicy: Ignore
+    sideEffects: None
+    name: elastic-es-validation-v1.k8s.elastic.co
+    admissionReviewVersions: ["v1"]
+    rules:
+      - apiGroups:
+          - elasticsearch.k8s.elastic.co
+        apiVersions:
+          - v1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - elasticsearches
+  - clientConfig:
+      caBundle: Cg==
+      service:
+        name: {{ .Values.elasticsearchOperator.name | default "elasticsearch-operator" }}
+        namespace: {{ .Values.namespace | default "erda-system" }}
+        path: /validate-elasticsearch-k8s-elastic-co-v1beta1-elasticsearch
+    sideEffects: None
+    failurePolicy: Ignore
+    name: elastic-es-validation-v1beta1.k8s.elastic.co
+    admissionReviewVersions: ["v1beta1"]
+    rules:
+      - apiGroups:
+          - elasticsearch.k8s.elastic.co
+        apiVersions:
+          - v1beta1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - elasticsearches
