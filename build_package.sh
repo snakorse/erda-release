@@ -15,6 +15,11 @@ if [[ -z $ERDA_VERSION ]]; then
     exit
 fi
 
+if [[ -z $ERDA_OS_SYSTEM ]]; then
+    echo "ERDA_OS_SYSTEM is empty"
+    exit
+fi
+
 wget https://raw.githubusercontent.com/erda-project/erda/release/${ERDA_VERSION}/docs/guides/deploy/How-to-install-the-Erda.md -O ./erda/How-to-install-the-Erda.md
 
 tar -cvzf package/erda-${ERDA_OS_SYSTEM}.tar.gz erda/
