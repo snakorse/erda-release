@@ -1,7 +1,7 @@
 namespace: ${ERDA_NAMESPACE}
 
 image:
-  repository: erda-registry.cn-hangzhou.cr.aliyuncs.com/erda
+  repository: registry.erda.cloud/erda
   imagePullPolicy: IfNotPresent
   
 

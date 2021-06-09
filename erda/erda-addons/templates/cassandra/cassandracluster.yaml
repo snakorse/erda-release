@@ -10,7 +10,7 @@ spec:
     tolerations:
       - operator: Exists
   cassandraImage: {{ .Values.image.repository }}/{{ .Values.cassandra.name | default "addon-cassandra" }}:{{ .Values.cassandra.version }}
-  bootstrapImage: erda-registry.cn-hangzhou.cr.aliyuncs.com/erda/cassandra-bootstrap:0.1.8
+  bootstrapImage: registry.erda.cloud/erda/cassandra-bootstrap:0.1.8
   configMapName: cassandra-configmap-v1
   imagepullpolicy: {{ .Values.image.imagePullPolicy }}
   {{- if .Values.cassandra.imagePullSecret }}
@@ -29,7 +29,7 @@ spec:
   maxPodUnavailable: 1
   runAsUser: 999
   backRestSidecar:
-    image: erda-registry.cn-hangzhou.cr.aliyuncs.com/erda/instaclustr-icarus:1.0.9
+    image: registry.erda.cloud/erda/instaclustr-icarus:1.0.9
   resources:
     requests:
       cpu: {{ .Values.cassandra.resources.requests.cpu | default "0.1" | quote }}

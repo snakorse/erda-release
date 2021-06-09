@@ -98,7 +98,7 @@ spec:
             - sysctl
             - -w
             - vm.max_map_count=262144
-          image: erda-registry.cn-hangzhou.cr.aliyuncs.com/erda/kubedb-busybox:1.0.0
+          image: registry.erda.cloud/erda/kubedb-busybox:1.0.0
           imagePullPolicy: IfNotPresent
           name: init-sysctl
           resources:
