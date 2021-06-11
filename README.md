@@ -15,12 +15,19 @@
     cd erda-release
    ```
 
-3. export ERDA_VERSION like 1.0,1.1,2.0, you can find the Erda verion list on [here](https://github.com/erda-project/erda/branches/all).
-   
+3. export the Erda package necessary config
+
+   > ERDA_VERSION like 1.0,1.1,2.0, you can find the Erda verion list on [here](https://github.com/erda-project/erda/branches/all).
+   > For example, if you find a branch name is release/1.0, you should set 1.0 to the ERDA_VERSION env
    ```shell
-   # For example, if you find a branch name is release/1.0, you should set 1.0 to the ERDA_VERSION env
    export ERDA_VERSION=
    ```
+
+   > ERDA_OS_SYSTEM means which os will the Erda package for. you can set  linux, windows and darwin
+   ```shell
+   export ERDA_OS_SYSTEM=
+   ```
+
 
 
 4. Package the tarball

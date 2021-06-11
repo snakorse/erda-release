@@ -665,7 +665,7 @@ spec:
         dice/lb: "true"
       containers:
         - name: nginx-ingress-controller
-          image: erda-registry.cn-hangzhou.cr.aliyuncs.com/erda/nginx-ingress-controller:0.25.1-1
+          image: registry.erda.cloud/erda/nginx-ingress-controller:0.25.1-1
           imagePullPolicy: IfNotPresent
           args:
             - /nginx-ingress-controller

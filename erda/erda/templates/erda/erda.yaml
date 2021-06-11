@@ -15,7 +15,7 @@ spec:
     version: "2.0"
     jobs:
       init-image:
-        image: erda-registry.cn-hangzhou.cr.aliyuncs.com/erda/init-image:1.0.0-20210524-46bf3c69
+        image: registry.erda.cloud/erda/init-image:4.0-20210609-659e9a0b
         resources:
           cpu: 0.5
           mem: 128
@@ -27,7 +27,7 @@ spec:
       ETCDCTL_API: "3"
     services:
       apim:
-        image: erda-registry.cn-hangzhou.cr.aliyuncs.com/erda/erda:4.0-20210521-3a995ee
+        image: registry.erda.cloud/erda/erda:4.0-20210521-3a995ee
         cmd: /app/apim
         ports:
           - port: 3083
@@ -63,7 +63,7 @@ spec:
             duration: 120
           exec: {}
       cmdb:
-        image: erda-registry.cn-hangzhou.cr.aliyuncs.com/erda/cmdb:4.0-20210522-e3c275c
+        image: registry.erda.cloud/erda/cmdb:4.0-20210603-86d38a9
         cmd: /app/cmdb
         ports:
           - port: 9093
@@ -117,7 +117,7 @@ spec:
             duration: 120
           exec: {}
       dicehub:
-        image: erda-registry.cn-hangzhou.cr.aliyuncs.com/erda/erda:4.0-20210521-3a995ee
+        image: registry.erda.cloud/erda/erda:4.0-20210521-3a995ee
         cmd: /app/dicehub
         ports:
           - port: 10000
@@ -153,7 +153,7 @@ spec:
             duration: 120
           exec: {}
       eventbox:
-        image: erda-registry.cn-hangzhou.cr.aliyuncs.com/erda/erda:4.0-20210521-3a995ee
+        image: registry.erda.cloud/erda/erda:4.0-20210521-3a995ee
         cmd: /app/eventbox
         ports:
           - port: 9528
@@ -186,7 +186,7 @@ spec:
             duration: 120
           exec: {}
       gittar:
-        image: erda-registry.cn-hangzhou.cr.aliyuncs.com/erda/erda:4.0-20210521-3a995ee
+        image: registry.erda.cloud/erda/gittar:4.0-20210608-b89f33e
         cmd: /app/gittar
         ports:
           - port: 5566
@@ -229,7 +229,7 @@ spec:
           http: {}
           exec: {}
       gittar-adaptor:
-        image: erda-registry.cn-hangzhou.cr.aliyuncs.com/erda/erda:4.0-20210521-3a995ee
+        image: registry.erda.cloud/erda/gittar-adaptor:4.0-20210608-b89f33e
         cmd: /app/gittar-adaptor
         ports:
           - port: 1086
@@ -261,7 +261,7 @@ spec:
             duration: 120
           exec: {}
       openapi:
-        image: erda-registry.cn-hangzhou.cr.aliyuncs.com/erda/erda:4.0-20210521-3a995ee
+        image: registry.erda.cloud/erda/openapi:4.0-20210608-b89f33e
         cmd: /app/openapi
         ports:
           - port: 9529
@@ -303,7 +303,7 @@ spec:
             duration: 120
           exec: {}
       ops:
-        image: erda-registry.cn-hangzhou.cr.aliyuncs.com/erda/erda:4.0-20210521-3a995ee
+        image: registry.erda.cloud/erda/erda:4.0-20210521-3a995ee
         cmd: /app/ops
         ports:
           - port: 9027
@@ -335,7 +335,7 @@ spec:
           exec: {}
       orchestrator:
         cmd: /app/orchestrator
-        image: erda-registry.cn-hangzhou.cr.aliyuncs.com/erda/erda:4.0-20210521-3a995ee
+        image: registry.erda.cloud/erda/orchestrator:4.0-20210528-1293142
         ports:
           - port: 8081
             protocol: TCP
@@ -377,7 +377,7 @@ spec:
             duration: 120
           exec: {}
       pipeline:
-        image: erda-registry.cn-hangzhou.cr.aliyuncs.com/erda/erda:4.0-20210521-3a995ee
+        image: registry.erda.cloud/erda/pipeline:4.0-20210604-9f79628b
         cmd: /app/pipeline
         ports:
           - port: 3081
@@ -418,7 +418,7 @@ spec:
             duration: 120
           exec: {}
       qa:
-        image: erda-registry.cn-hangzhou.cr.aliyuncs.com/erda/erda:4.0-20210521-3a995ee
+        image: registry.erda.cloud/erda/qa:4.0-20210608-3a38fdf4
         cmd: /app/qa
         ports:
           - port: 3033
@@ -453,7 +453,7 @@ spec:
             duration: 120
           exec: {}
       action-runner-scheduler:
-        image: erda-registry.cn-hangzhou.cr.aliyuncs.com/erda/erda:4.0-20210521-3a995ee
+        image: registry.erda.cloud/erda/erda:4.0-20210521-3a995ee
         cmd: /app/action-runner-scheduler
         ports:
           - port: 9500
@@ -484,7 +484,7 @@ spec:
           exec: {}
       scheduler:
         cmd: /app/scheduler
-        image: erda-registry.cn-hangzhou.cr.aliyuncs.com/erda/scheduler:4.0-20210518-59cc108
+        image: registry.erda.cloud/erda/scheduler:4.0-20210528-3965cfd
         ports:
           - port: 9091
             protocol: TCP
@@ -517,7 +517,7 @@ spec:
           exec: {}
       soldier:
         cmd: /app/soldier
-        image: erda-registry.cn-hangzhou.cr.aliyuncs.com/erda/soldier:4.0-20210426-daef74b
+        image: registry.erda.cloud/erda/soldier:4.0-20210426-daef74b
         ports:
           - port: 9028
             protocol: TCP
@@ -566,7 +566,7 @@ spec:
     envs: {}
     services:
       ui:
-        image: erda-registry.cn-hangzhou.cr.aliyuncs.com/erda/erda-ui:1.0-20210521-15bd370
+        image: registry.erda.cloud/erda/erda-ui:1.0-20210608-3c4ccba
         ports:
           - 80
         envs:
@@ -617,7 +617,7 @@ spec:
     version: "2.0"
     services:
       uc:
-        image: erda-registry.cn-hangzhou.cr.aliyuncs.com/erda/uc:dice-4.0-20210521-361faba4
+        image: registry.erda.cloud/erda/uc:dice-4.0-20210603-a70f1811
         ports:
         - 8080
         envs:
@@ -675,7 +675,7 @@ spec:
       TASK_MANAGER_NUMBER_OF_TASK_SLOTS: "2"
     services:
       analyzer-alert:
-        image: erda-registry.cn-hangzhou.cr.aliyuncs.com/erda/erda-analyzer-alert:4.0.0-20210514-d298dd0
+        image: registry.erda.cloud/erda/erda-analyzer-alert:4.0.0-20210607-a14eed0
         cmd: flink-entrypoint.sh jobcluster --job-classname cloud.erda.analyzer.alert.Main
         ports:
         - port: 8081
@@ -720,7 +720,7 @@ spec:
             duration: 120
           exec: {}
       analyzer-alert-task:
-        image: erda-registry.cn-hangzhou.cr.aliyuncs.com/erda/erda-analyzer-alert:4.0.0-20210514-d298dd0
+        image: registry.erda.cloud/erda/erda-analyzer-alert:4.0.0-20210607-a14eed0
         cmd: flink-entrypoint.sh taskmanager
         ports:
         - port: 6123
@@ -753,7 +753,7 @@ spec:
             cmd: ps aux | grep TaskManagerRunner || exit 1
             duration: 120
       analyzer-error-insight:
-        image: erda-registry.cn-hangzhou.cr.aliyuncs.com/erda/erda-analyzer-error-insight:4.0.0-20210514-d298dd0
+        image: registry.erda.cloud/erda/erda-analyzer-error-insight:4.0.0-20210607-a14eed0
         cmd: flink-entrypoint.sh jobcluster --job-classname cloud.erda.analyzer.errorInsight.Main
         ports:
         - port: 8081
@@ -791,7 +791,7 @@ spec:
             duration: 120
           exec: {}
       analyzer-error-insight-task:
-        image: erda-registry.cn-hangzhou.cr.aliyuncs.com/erda/erda-analyzer-error-insight:4.0.0-20210514-d298dd0
+        image: registry.erda.cloud/erda/erda-analyzer-error-insight:4.0.0-20210607-a14eed0
         cmd: flink-entrypoint.sh taskmanager
         ports:
         - port: 6123
@@ -824,7 +824,7 @@ spec:
             cmd: ps aux | grep TaskManagerRunner || exit 1
             duration: 120
       analyzer-metrics:
-        image: erda-registry.cn-hangzhou.cr.aliyuncs.com/erda/erda-analyzer-metrics:4.0.0-20210514-d298dd0
+        image: registry.erda.cloud/erda/erda-analyzer-metrics:4.0.0-20210607-a14eed0
         cmd: flink-entrypoint.sh jobcluster --job-classname cloud.erda.analyzer.metrics.Main
         ports:
         - port: 8081
@@ -867,7 +867,7 @@ spec:
             duration: 120
           exec: {}
       analyzer-metrics-task:
-        image: erda-registry.cn-hangzhou.cr.aliyuncs.com/erda/erda-analyzer-metrics:4.0.0-20210514-d298dd0
+        image: registry.erda.cloud/erda/erda-analyzer-metrics:4.0.0-20210607-a14eed0
         cmd: flink-entrypoint.sh taskmanager
         ports:
         - port: 6123
@@ -938,7 +938,7 @@ spec:
     envs: {}
     services:
       telegraf:
-        image: erda-registry.cn-hangzhou.cr.aliyuncs.com/erda/telegraf:4.0-20210520-2634aa6
+        image: registry.erda.cloud/erda/telegraf:4.0-20210527-a8a0005
         ports:
         - port: 8090
           protocol: TCP
@@ -983,7 +983,7 @@ spec:
             cmd: ps aux | grep telegraf || exit 1
             duration: 120
       telegraf-app:
-        image: erda-registry.cn-hangzhou.cr.aliyuncs.com/erda/telegraf:4.0-20210520-2634aa6
+        image: registry.erda.cloud/erda/telegraf:4.0-20210527-a8a0005
         ports:
         - port: 8091
           protocol: TCP
@@ -1017,7 +1017,7 @@ spec:
             cmd: ps aux | grep telegraf || exit 1
             duration: 120
       telegraf-platform:
-        image: erda-registry.cn-hangzhou.cr.aliyuncs.com/erda/telegraf:4.0-20210520-2634aa6
+        image: registry.erda.cloud/erda/telegraf:4.0-20210527-a8a0005
         ports:
         - port: 8092
           protocol: TCP
@@ -1086,7 +1086,7 @@ spec:
     envs: {}
     services:
       filebeat:
-        image: erda-registry.cn-hangzhou.cr.aliyuncs.com/erda/filebeat:4.0.0-20210422-5b97371
+        image: registry.erda.cloud/erda/filebeat:4.0.0-20210422-5b97371
         envs:
           DOCKER_SOCK_PATH: unix:///rootfs/var/run/docker.sock
           COLLECTOR_AUTH_PASSWORD: G$9767bP32drYFPWrK4XMLRMTatiM6cU
@@ -1122,7 +1122,7 @@ spec:
     envs: {}
     services:
       tmc:
-        image: erda-registry.cn-hangzhou.cr.aliyuncs.com/erda/tmc:4.0.0-20210518-06fc728
+        image: registry.erda.cloud/erda/tmc:4.0.0-20210607-f5f8af1
         ports:
         - port: 8050
           protocol: TCP
@@ -1182,7 +1182,7 @@ spec:
     services:
       hepa:
         cmd: /app/hepa
-        image: erda-registry.cn-hangzhou.cr.aliyuncs.com/erda/erda:4.0-20210521-3a995ee
+        image: registry.erda.cloud/erda/erda:4.0-20210521-3a995ee
         ports:
         - port: 8080
           protocol: TCP
@@ -1224,7 +1224,7 @@ spec:
     envs: {}
     services:
       collector:
-        image: erda-registry.cn-hangzhou.cr.aliyuncs.com/erda/erda:4.0-20210521-3a995ee
+        image: registry.erda.cloud/erda/erda:4.0-20210521-3a995ee
         cmd: /app/collector
         ports:
         - port: 7076
@@ -1258,7 +1258,7 @@ spec:
             duration: 120
       monitor:
         cmd: /app/monitor
-        image: erda-registry.cn-hangzhou.cr.aliyuncs.com/erda/erda:4.0-20210521-3a995ee
+        image: registry.erda.cloud/erda/monitor:4.0-20210608-b89f33e
         ports:
         - port: 7096
           protocol: TCP
@@ -1304,7 +1304,7 @@ spec:
             duration: 120
       streaming:
         cmd: /app/streaming
-        image: erda-registry.cn-hangzhou.cr.aliyuncs.com/erda/erda:4.0-20210521-3a995ee
+        image: registry.erda.cloud/erda/erda:4.0-20210521-3a995ee
         ports:
         - port: 7091
           protocol: TCP

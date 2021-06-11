@@ -1,7 +1,7 @@
 namespace: default
 
 image:
-  repository: erda-registry.cn-hangzhou.cr.aliyuncs.com/erda/
+  repository: registry.erda.cloud/erda/
   imagePullPolicy: IfNotPresent
   components:
     init: init-image:1.0.0-20210510-21a3c66

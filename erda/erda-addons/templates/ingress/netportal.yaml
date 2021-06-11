@@ -23,7 +23,7 @@ spec:
       - env:
         - name: DICE_COMPONENT
           value: netportal
-        image: erda-registry.cn-hangzhou.cr.aliyuncs.com/erda/netportal:1.1
+        image: registry.erda.cloud/erda/netportal:1.1
         imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 20

@@ -61,7 +61,12 @@ spec:
         - name: etcd-server-peer-secret
           mountPath: /etc/kubernetes/ssl/
           readOnly: true
+        - name: etcd-persistent-storage
+          mountPath: /var/lib/etcd
       volumes:
       - name: etcd-server-peer-secret
         secret:
           secretName: etcd-server-peer-secret
+      - name: etcd-persistent-storage
+        persistentVolumeClaim:
+          claimName: etcd-pv-claim

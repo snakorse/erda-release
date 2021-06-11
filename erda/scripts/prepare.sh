@@ -135,9 +135,8 @@ if [[ $ERDA_NETPORTAL_ENABLE != "" ]]; then
 	envsubst < ../templates/netportal-admin.yaml > ../erda-addons/templates/ingress/netportal-admin.yaml
 	envsubst < ../templates/netportal-edge.yaml > ../erda-addons/templates/ingress/netportal-edge.yaml
 
-	
-	kubectl delete -f ../nginx_tlmp.yaml --ignore-not-found=true
-	kubectl create -f ../nginx_tlmp.yaml
+	kubectl delete -f ../templates/nginx_tlmp.yaml --ignore-not-found=true
+	kubectl create -f ../templates/nginx_tlmp.yaml
 
 fi
 

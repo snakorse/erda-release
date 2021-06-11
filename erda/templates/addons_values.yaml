@@ -3,7 +3,7 @@ namespace: ${ERDA_NAMESPACE}
 size: ${ERDA_SIZE}
 
 image:
-  repository: erda-registry.cn-hangzhou.cr.aliyuncs.com/erda
+  repository: registry.erda.cloud/erda
   imagePullPolicy: IfNotPresent
 
 domain: ${ERDA_GENERIC_DOMAIN}
