@@ -15,7 +15,7 @@ spec:
     version: "2.0"
     jobs:
       init-image:
-        image: registry.erda.cloud/erda/init-image:4.0-20210609-659e9a0b
+        image: registry.erda.cloud/erda/init-image:4.0-20210705-03eb7751
         resources:
           cpu: 0.5
           mem: 128
@@ -63,7 +63,7 @@ spec:
             duration: 120
           exec: {}
       cmdb:
-        image: registry.erda.cloud/erda/cmdb:4.0-20210603-86d38a9
+        image: registry.erda.cloud/erda/cmdb:4.0-20210629-667eb5c3
         cmd: /app/cmdb
         ports:
           - port: 9093
@@ -186,7 +186,7 @@ spec:
             duration: 120
           exec: {}
       gittar:
-        image: registry.erda.cloud/erda/gittar:4.0-20210608-b89f33e
+        image: registry.erda.cloud/erda/gittar:1.1-20210610-ad9ee830
         cmd: /app/gittar
         ports:
           - port: 5566
@@ -261,7 +261,7 @@ spec:
             duration: 120
           exec: {}
       openapi:
-        image: registry.erda.cloud/erda/openapi:4.0-20210608-b89f33e
+        image: registry.erda.cloud/erda/openapi:4.0-20210628-8b34f32
         cmd: /app/openapi
         ports:
           - port: 9529
@@ -335,7 +335,7 @@ spec:
           exec: {}
       orchestrator:
         cmd: /app/orchestrator
-        image: registry.erda.cloud/erda/orchestrator:4.0-20210528-1293142
+        image: registry.erda.cloud/erda/orchestrator:4.0-20210623-4b1ba231
         ports:
           - port: 8081
             protocol: TCP
@@ -377,7 +377,7 @@ spec:
             duration: 120
           exec: {}
       pipeline:
-        image: registry.erda.cloud/erda/pipeline:4.0-20210604-9f79628b
+        image: registry.erda.cloud/erda/pipeline:4.0-20210629-2a28c924
         cmd: /app/pipeline
         ports:
           - port: 3081
@@ -484,7 +484,7 @@ spec:
           exec: {}
       scheduler:
         cmd: /app/scheduler
-        image: registry.erda.cloud/erda/scheduler:4.0-20210528-3965cfd
+        image: registry.erda.cloud/erda/scheduler:4.0-20210705-ef33c597
         ports:
           - port: 9091
             protocol: TCP
@@ -517,7 +517,7 @@ spec:
           exec: {}
       soldier:
         cmd: /app/soldier
-        image: registry.erda.cloud/erda/soldier:4.0-20210426-daef74b
+        image: registry.erda.cloud/erda/soldier:4.0-20210629-60a6d644
         ports:
           - port: 9028
             protocol: TCP
@@ -566,7 +566,7 @@ spec:
     envs: {}
     services:
       ui:
-        image: registry.erda.cloud/erda/erda-ui:1.0-20210608-3c4ccba
+        image: registry.erda.cloud/erda/erda-ui:1.0-20210629-00c7a3f4
         ports:
           - 80
         envs:
@@ -617,7 +617,7 @@ spec:
     version: "2.0"
     services:
       uc:
-        image: registry.erda.cloud/erda/uc:dice-4.0-20210603-a70f1811
+        image: registry.erda.cloud/erda/uc:dice-4.0-20210630-f4d63b99
         ports:
         - 8080
         envs:
@@ -675,7 +675,7 @@ spec:
       TASK_MANAGER_NUMBER_OF_TASK_SLOTS: "2"
     services:
       analyzer-alert:
-        image: registry.erda.cloud/erda/erda-analyzer-alert:4.0.0-20210607-a14eed0
+        image: registry.erda.cloud/erda/erda-analyzer-alert:4.0.0-20210615-9f62286
         cmd: flink-entrypoint.sh jobcluster --job-classname cloud.erda.analyzer.alert.Main
         ports:
         - port: 8081
@@ -720,7 +720,7 @@ spec:
             duration: 120
           exec: {}
       analyzer-alert-task:
-        image: registry.erda.cloud/erda/erda-analyzer-alert:4.0.0-20210607-a14eed0
+        image: registry.erda.cloud/erda/erda-analyzer-alert:4.0.0-20210615-9f62286
         cmd: flink-entrypoint.sh taskmanager
         ports:
         - port: 6123
@@ -753,7 +753,7 @@ spec:
             cmd: ps aux | grep TaskManagerRunner || exit 1
             duration: 120
       analyzer-error-insight:
-        image: registry.erda.cloud/erda/erda-analyzer-error-insight:4.0.0-20210607-a14eed0
+        image: registry.erda.cloud/erda/erda-analyzer-error-insight:4.0.0-20210615-9f62286
         cmd: flink-entrypoint.sh jobcluster --job-classname cloud.erda.analyzer.errorInsight.Main
         ports:
         - port: 8081
@@ -791,7 +791,7 @@ spec:
             duration: 120
           exec: {}
       analyzer-error-insight-task:
-        image: registry.erda.cloud/erda/erda-analyzer-error-insight:4.0.0-20210607-a14eed0
+        image: registry.erda.cloud/erda/erda-analyzer-error-insight:4.0.0-20210615-9f62286
         cmd: flink-entrypoint.sh taskmanager
         ports:
         - port: 6123
@@ -824,7 +824,7 @@ spec:
             cmd: ps aux | grep TaskManagerRunner || exit 1
             duration: 120
       analyzer-metrics:
-        image: registry.erda.cloud/erda/erda-analyzer-metrics:4.0.0-20210607-a14eed0
+        image:registry.erda.cloud/erda/erda-analyzer-metrics:4.0.0-20210607-a14eed0
         cmd: flink-entrypoint.sh jobcluster --job-classname cloud.erda.analyzer.metrics.Main
         ports:
         - port: 8081
@@ -1122,7 +1122,7 @@ spec:
     envs: {}
     services:
       tmc:
-        image: registry.erda.cloud/erda/tmc:4.0.0-20210607-f5f8af1
+        image: registry.erda.cloud/erda/tmc:4.0.0-20210611-95bcc05
         ports:
         - port: 8050
           protocol: TCP
@@ -1224,7 +1224,7 @@ spec:
     envs: {}
     services:
       collector:
-        image: registry.erda.cloud/erda/erda:4.0-20210521-3a995ee
+        image: registry.erda.cloud/erda/erda:4.0-20210510-73c6b42
         cmd: /app/collector
         ports:
         - port: 7076
@@ -1258,7 +1258,7 @@ spec:
             duration: 120
       monitor:
         cmd: /app/monitor
-        image: registry.erda.cloud/erda/monitor:4.0-20210608-b89f33e
+        image: registry.erda.cloud/erda/erda:4.0-20210618-d793669
         ports:
         - port: 7096
           protocol: TCP
@@ -1304,7 +1304,7 @@ spec:
             duration: 120
       streaming:
         cmd: /app/streaming
-        image: registry.erda.cloud/erda/erda:4.0-20210521-3a995ee
+        image: registry.erda.cloud/erda/erda:4.0-20210519-37c67ed
         ports:
         - port: 7091
           protocol: TCP
