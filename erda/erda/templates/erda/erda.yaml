@@ -824,7 +824,7 @@ spec:
             cmd: ps aux | grep TaskManagerRunner || exit 1
             duration: 120
       analyzer-metrics:
-        image:registry.erda.cloud/erda/erda-analyzer-metrics:4.0.0-20210607-a14eed0
+        image: registry.erda.cloud/erda/erda-analyzer-metrics:4.0.0-20210607-a14eed0
         cmd: flink-entrypoint.sh jobcluster --job-classname cloud.erda.analyzer.metrics.Main
         ports:
         - port: 8081
