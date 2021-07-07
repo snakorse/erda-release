@@ -229,7 +229,7 @@ spec:
           http: {}
           exec: {}
       gittar-adaptor:
-        image: registry.erda.cloud/erda/gittar-adaptor:4.0-20210608-b89f33e
+        image: registry.erda.cloud/erda/gittar-adaptor:4.0-20210706-ef33c597
         cmd: /app/gittar-adaptor
         ports:
           - port: 1086
@@ -566,7 +566,7 @@ spec:
     envs: {}
     services:
       ui:
-        image: registry.erda.cloud/erda/erda-ui:1.0-20210629-00c7a3f4
+        image: registry.erda.cloud/erda/erda-ui:1.0-20210706-29c96503
         ports:
           - 80
         envs:
