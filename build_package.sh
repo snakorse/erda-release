@@ -17,6 +17,8 @@ if [[ -z $ERDA_VERSION ]]; then
     exit
 fi
 
+echo "${ERDA_VERSION}" > erda/VERSION
+
 if [[ -z $ERDA_OS_SYSTEM ]]; then
     echo "ERDA_OS_SYSTEM is empty"
     exit
@@ -24,8 +26,8 @@ fi
 
 rm -rf erda/How-to-install-Erda.md
 rm -rf erda/How-to-install-Erda-zh.md
-wget https://raw.githubusercontent.com/erda-project/erda/release/${ERDA_VERSION}/docs/guides/deploy/How-to-install-Erda.md -O erda/How-to-install-Erda.md 
-wget https://raw.githubusercontent.com/erda-project/erda/release/${ERDA_VERSION}/docs/guides/deploy/How-to-install-Erda-zh.md -O erda/How-to-install-Erda-zh.md
+wget https://raw.githubusercontent.com/erda-project/erda/v${ERDA_VERSION}/docs/guides/deploy/How-to-install-Erda.md -O erda/How-to-install-Erda.md
+wget https://raw.githubusercontent.com/erda-project/erda/v${ERDA_VERSION}/docs/guides/deploy/How-to-install-Erda-zh.md -O erda/How-to-install-Erda-zh.md
 
 if [[ $ERDA_OS_SYSTEM == "linux" ]]; then
     tar -cvzf package/erda-${ERDA_OS_SYSTEM}.tar.gz erda/
