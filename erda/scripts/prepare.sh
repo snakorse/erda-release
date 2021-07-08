@@ -145,8 +145,8 @@ fi
 rm -rf ${helm_package}
 mkdir ${helm_package}
 
-helm package ../erda-base -d ${helm_package}
-helm package ../erda-addons -d ${helm_package}
-helm package ../erda -d ${helm_package}
+helm package ../erda-base -d ${helm_package} --version $(cat ../VERSION)
+helm package ../erda-addons -d ${helm_package} --version ${cat ../VERSION}
+helm package ../erda -d ${helm_package} --version $(cat ../VERSION)
 
 kubectl delete job erda-init-image --ignore-not-found=true
