@@ -32,7 +32,3 @@ wget https://raw.githubusercontent.com/erda-project/erda/v${ERDA_VERSION}/docs/g
 if [[ $ERDA_OS_SYSTEM == "linux" ]]; then
     tar -cvzf package/erda-${ERDA_OS_SYSTEM}.tar.gz erda/
 fi
-
-if [[ $ERDA_OS_SYSTEM == "windows" ]]; then
-    zip -r package/erda-${ERDA_OS_SYSTEM}.zip erda/
-fi
