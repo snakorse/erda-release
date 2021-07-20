@@ -1,0 +1,10 @@
+zookeeper:
+  name: addon-zookeeper
+  version: 3.4.13-monitor
+  resources:
+    requests:
+      cpu:
+      memory:
+    limits:
+      cpu:
+      memory:

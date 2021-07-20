@@ -1,0 +1,16 @@
+volumeProvisoner:
+  name: volume-provisioner
+  version: 1.0.0-20210416-1a3758f
+  provisioner:
+    local: dice/local-volume
+    nfs: dice/netdata-volume
+  storageclass:
+    local: dice-local-volume
+    nfs: dice-nfs-volume
+  resources:
+    requests:
+      cpu:
+      memory:
+    limits:
+      cpu:
+      memory:

@@ -1,0 +1,6 @@
+mysql:
+  name: erda-mysql
+  version: 5.7.34
+  user: erda
+  database: erda
+  password: password

@@ -1,0 +1,13 @@
+registry:
+  name: addon-registry
+  version: 2.7.1
+  resources:
+    requests:
+      cpu:
+      memory:
+    limits:
+      cpu:
+      memory:
+  networkMode: ${ERDA_REGISTRY_NETMODE}
+  hostURL: ${ERDA_REGISTRY_HOSTURL}
+  nodematchExpressions: [{ key: kubernetes.io/hostname, operator: In, values: [${ERDA_REGISTRY_HOSTNAME}] }]

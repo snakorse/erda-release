@@ -1,0 +1,13 @@
+kafka:
+  name: addon-kafka
+  version: 1.1.0-20210323-be01a9b
+  resources:
+    requests:
+      cpu:
+      memory:
+    limits:
+      cpu:
+      memory:
+  replicas: 1
+  java:
+    heapmemory: "2048"

@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.etcd.name | default "erda-etcd" }}
+  namespace: {{ .Values.global.namespace | default "erda-system" }}
+  labels:
+    app: {{ .Values.etcd.name | default "erda-etcd" }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.etcd.name | default "erda-etcd" }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.etcd.name | default "erda-etcd" }}
+    spec:
+      tolerations:
+      - operator: Exists
+      containers:
+      - name: {{ .Values.etcd.name | default "erda-etcd" }}
+        image: {{ .Values.global.image.repository}}/{{ .Values.etcd.name | default "erad-etcd" }}:{{ .Values.etcd.version }}
+        imagePullPolicy: IfNotPresent
+        command:
+        - etcd
+        - --enable-pprof=true
+        - --advertise-client-urls=https://erda-etcd.{{ .Values.global.namespace | default "erda-system" }}.svc.cluster.local:2379
+        - --data-dir=/var/lib/etcd
+        - --initial-advertise-peer-urls=https://erda-etcd.{{ .Values.global.namespace | default "erda-system" }}.svc.cluster.local:2380
+        - --initial-cluster={{ .Values.etcd.name | default "erda-etcd" }}=https://erda-etcd.{{ .Values.global.namespace | default "erda-system" }}.svc.cluster.local:2380
+        - --listen-client-urls=https://0.0.0.0:2379
+        - --listen-metrics-urls=https://0.0.0.0:2381
+        - --listen-peer-urls=https://0.0.0.0:2380
+        - --name={{ .Values.etcd.name | default "erda-etcd" }}
+        - --snapshot-count=10000
+        - --auto-compaction-retention=1
+        - --quota-backend-bytes=8589934592
+        - --client-cert-auth=true
+        - --trusted-ca-file=/etc/kubernetes/ssl/etcd-ca.pem
+        - --cert-file=/etc/kubernetes/ssl/etcd-server.pem
+        - --key-file=/etc/kubernetes/ssl/etcd-server-key.pem
+        - --peer-client-cert-auth=true
+        - --peer-trusted-ca-file=/etc/kubernetes/ssl/etcd-ca.pem
+        - --peer-cert-file=/etc/kubernetes/ssl/etcd-peer.pem
+        - --peer-key-file=/etc/kubernetes/ssl/etcd-peer-key.pem
+        ports:
+        - containerPort: 2379
+          name: client
+          protocol: TCP
+        - containerPort: 2380
+          name: server
+          protocol: TCP
+        resources:
+          limits:
+            cpu: "1"
+            memory: 2Gi
+          requests:
+            cpu: 100m
+            memory: 1Gi
+        volumeMounts:
+        - name: etcd-server-peer-secret
+          mountPath: /etc/kubernetes/ssl/
+          readOnly: true
+        - name: etcd-persistent-storage
+          mountPath: /var/lib/etcd
+      volumes:
+      - name: etcd-server-peer-secret
+        secret:
+          secretName: etcd-server-peer-secret
+      - name: etcd-persistent-storage
+        persistentVolumeClaim:
+          claimName: etcd-pv-claim

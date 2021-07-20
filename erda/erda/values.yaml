@@ -1,3 +1,11 @@
+# TODO: global values
+global:
+  namespace: default
+  image:
+    repository: registry.erda.cloud/erda/
+    imagePullPolicy: IfNotPresent
+
+# TODO: old values for erda charts.
 namespace: default
 
 image:
