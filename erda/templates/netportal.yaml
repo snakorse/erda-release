@@ -5,7 +5,7 @@ metadata:
   labels:
     app: netportal
   name: netportal
-  namespace: {{ .Values.namespace | default "erda-system" }}
+  namespace: {{ .Values.global.namespace | default "erda-system" }}
 spec:
   replicas: 1
   selector:
@@ -23,7 +23,7 @@ spec:
       - env:
         - name: DICE_COMPONENT
           value: netportal
-        image: {{ .Values.image.repository }}/netportal:1.1
+        image: {{ .Values.global.image.repository }}/netportal:1.1
         imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 20
@@ -70,7 +70,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: netportal
-  namespace: {{ .Values.namespace | default "erda-system" }}
+  namespace: {{ .Values.global.namespace | default "erda-system" }}
 spec:
   ports:
   - name: http
@@ -89,5 +89,5 @@ data:
 kind: Secret
 metadata:
   name: netportal-central
-  namespace: {{ .Values.namespace | default "erda-system" }}
+  namespace: {{ .Values.global.namespace | default "erda-system" }}
 type: Opaque

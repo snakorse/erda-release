@@ -1,0 +1,15 @@
+elasticsearch:
+  name: addon-elasticsearch
+  replicas: 1
+  version: 6.2.4
+  resources:
+    requests:
+      cpu:
+      memory:
+    limits:
+      cpu:
+      memory:
+
+elasticsearchOperator:
+  name: elasticsearch-operator
+  version: 1.0.1

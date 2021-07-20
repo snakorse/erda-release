@@ -1,0 +1,12 @@
+kms:
+  name: addon-kms
+  version: 1.0.0-20200608-f11445f
+  replicas: 1
+  resources:
+    requests:
+      cpu:
+      memory:
+    limits:
+      cpu:
+      memory:
+  etcdEndpoints: https://erda-etcd.erda-system.svc.cluster.local:2379

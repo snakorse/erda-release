@@ -1,0 +1,22 @@
+cassandra:
+  name: addon-cassandra
+  version: 3.11.10
+  replicas: 1
+  resources:
+    requests:
+      cpu:
+      memory:
+    limits:
+      cpu:
+      memory:
+
+cassandraOperator:
+  name: cassandra-operator
+  version: v1.1.3-release
+  resources:
+    requests:
+      cpu:
+      memory:
+    limits:
+      cpu:
+      memory:
