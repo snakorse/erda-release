@@ -1,33 +1,41 @@
-apiVersion: erda.terminus.io/v1beta1
-kind: Erda
+apiVersion: dice.terminus.io/v1beta1
+kind: Dice
 metadata:
-  name: erda
+  name: dice
   namespace: {{ .Values.global.namespace | default "erda-system" }}
 spec:
+  {{- if not .Values.tags.work }}
   customDomain:
-    openapi: openapi.{{ .Values.domain }}
-    ui: {{ .Values.domain }}, *.{{ .Values.domain }}
-  cookieDomain: {{ .Values.domain }}
-  platformDomain: {{ .Values.domain }}
-  diceCluster: {{ .Values.clusterName }}
+    openapi: openapi.{{ .Values.erda.domain }}
+    ui: {{ .Values.erda.domain }}, *.{{ .Values.erda.domain }}
+  {{- else }}
+  mainPlatform:
+    collector: https://collector.{{ .Values.erda.masterClusterDomain }}
+    openapi: https://openapi.{{ .Values.erda.masterClusterDomain }}
+    cluster-dialer: https://cluster-dialer.{{ .Values.erda.masterClusterDomain }}
+  {{- end }}
+  cookieDomain: {{ .Values.erda.domain }}
+  platformDomain: {{ .Values.erda.domain }}
+  diceCluster: {{ .Values.erda.clusterName }}
   size: 'test'
   initJobs:
     version: "2.0"
     jobs:
       init-image:
-        image: registry.erda.cloud/erda/init-image:4.0-20210705-03eb7751
+        image: {{ .Values.global.image.repository }}/init-image:4.0-20210705-03eb7751
         resources:
           cpu: 0.5
           mem: 128
 
+  {{- if not .Values.tags.work }}
   dice:
     version: "2.0"
-    meta: {}
+    meta: { }
     envs:
       ETCDCTL_API: "3"
     services:
       apim:
-        image: registry.erda.cloud/erda/erda:4.0-20210521-3a995ee
+        image: {{ .Values.global.image.repository }}/erda:4.0-20210521-3a995ee
         cmd: /app/apim
         ports:
           - port: 3083
@@ -61,9 +69,9 @@ spec:
             port: 3083
             path: /health
             duration: 120
-          exec: {}
+          exec: { }
       cmdb:
-        image: registry.erda.cloud/erda/cmdb:4.0-20210629-667eb5c3
+        image: {{ .Values.global.image.repository }}/cmdb:4.0-20210629-667eb5c3
         cmd: /app/cmdb
         ports:
           - port: 9093
@@ -115,9 +123,9 @@ spec:
             port: 9093
             path: /info
             duration: 120
-          exec: {}
+          exec: { }
       dicehub:
-        image: registry.erda.cloud/erda/erda:4.0-20210521-3a995ee
+        image: {{ .Values.global.image.repository }}/erda:4.0-20210521-3a995ee
         cmd: /app/dicehub
         ports:
           - port: 10000
@@ -151,9 +159,9 @@ spec:
             port: 10000
             path: /healthz
             duration: 120
-          exec: {}
+          exec: { }
       eventbox:
-        image: registry.erda.cloud/erda/erda:4.0-20210521-3a995ee
+        image: {{ .Values.global.image.repository }}/erda:4.0-20210521-3a995ee
         cmd: /app/eventbox
         ports:
           - port: 9528
@@ -184,9 +192,9 @@ spec:
             port: 9528
             path: /api/dice/eventbox/version
             duration: 120
-          exec: {}
+          exec: { }
       gittar:
-        image: registry.erda.cloud/erda/gittar:1.1-20210610-ad9ee830
+        image: {{ .Values.global.image.repository }}/gittar:1.1-20210610-ad9ee830
         cmd: /app/gittar
         ports:
           - port: 5566
@@ -226,10 +234,10 @@ spec:
         expose:
           - 5566
         health_check:
-          http: {}
-          exec: {}
+          http: { }
+          exec: { }
       gittar-adaptor:
-        image: registry.erda.cloud/erda/gittar-adaptor:4.0-20210706-ef33c597
+        image: {{ .Values.global.image.repository }}/gittar-adaptor:4.0-20210706-ef33c597
         cmd: /app/gittar-adaptor
         ports:
           - port: 1086
@@ -259,9 +267,9 @@ spec:
             port: 1086
             path: /healthy
             duration: 120
-          exec: {}
+          exec: { }
       openapi:
-        image: registry.erda.cloud/erda/openapi:4.0-20210628-8b34f32
+        image: {{ .Values.global.image.repository }}/openapi:4.0-20210628-8b34f32
         cmd: /app/openapi
         ports:
           - port: 9529
@@ -301,9 +309,9 @@ spec:
             port: 9529
             path: /api/openapi/version
             duration: 120
-          exec: {}
+          exec: { }
       ops:
-        image: registry.erda.cloud/erda/erda:4.0-20210521-3a995ee
+        image: {{ .Values.global.image.repository }}/erda:4.0-20210521-3a995ee
         cmd: /app/ops
         ports:
           - port: 9027
@@ -331,11 +339,11 @@ spec:
           - orchestrator
           - cmdb
         health_check:
-          http: {}
-          exec: {}
+          http: { }
+          exec: { }
       orchestrator:
         cmd: /app/orchestrator
-        image: registry.erda.cloud/erda/orchestrator:4.0-20210623-4b1ba231
+        image: {{ .Values.global.image.repository }}/orchestrator:4.0-20210623-4b1ba231
         ports:
           - port: 8081
             protocol: TCP
@@ -375,9 +383,9 @@ spec:
             port: 8081
             path: /info
             duration: 120
-          exec: {}
+          exec: { }
       pipeline:
-        image: registry.erda.cloud/erda/pipeline:4.0-20210629-2a28c924
+        image: {{ .Values.global.image.repository }}/pipeline:4.0-20210629-2a28c924
         cmd: /app/pipeline
         ports:
           - port: 3081
@@ -416,9 +424,9 @@ spec:
             port: 3081
             path: /ping
             duration: 120
-          exec: {}
+          exec: { }
       qa:
-        image: registry.erda.cloud/erda/qa:4.0-20210608-3a38fdf4
+        image: {{ .Values.global.image.repository }}/qa:4.0-20210608-3a38fdf4
         cmd: /app/qa
         ports:
           - port: 3033
@@ -451,9 +459,9 @@ spec:
             port: 3033
             path: /health
             duration: 120
-          exec: {}
+          exec: { }
       action-runner-scheduler:
-        image: registry.erda.cloud/erda/erda:4.0-20210521-3a995ee
+        image: {{ .Values.global.image.repository }}/erda:4.0-20210521-3a995ee
         cmd: /app/action-runner-scheduler
         ports:
           - port: 9500
@@ -481,10 +489,10 @@ spec:
             port: 9500
             path: /healthz
             duration: 120
-          exec: {}
+          exec: { }
       scheduler:
         cmd: /app/scheduler
-        image: registry.erda.cloud/erda/scheduler:4.0-20210705-ef33c597
+        image: {{ .Values.global.image.repository }}/scheduler:4.0-20210705-ef33c597
         ports:
           - port: 9091
             protocol: TCP
@@ -514,10 +522,10 @@ spec:
             port: 9091
             path: /info
             duration: 120
-          exec: {}
+          exec: { }
       soldier:
         cmd: /app/soldier
-        image: registry.erda.cloud/erda/soldier:4.0-20210629-60a6d644
+        image: {{ .Values.global.image.repository }}/soldier:4.0-20210629-60a6d644
         ports:
           - port: 9028
             protocol: TCP
@@ -557,16 +565,15 @@ spec:
             port: 9028
             path: /_health_check
             duration: 120
-          exec: {}
-    addons: {}
-
+          exec: { }
+    addons: { }
   diceUI:
     version: "2.0"
-    meta: {}
-    envs: {}
+    meta: { }
+    envs: { }
     services:
       ui:
-        image: registry.erda.cloud/erda/erda-ui:1.0-20210706-29c96503
+        image: {{ .Values.global.image.repository }}/erda-ui:1.0-20210706-29c96503
         ports:
           - 80
         envs:
@@ -600,7 +607,7 @@ spec:
             port: 80
             path: "/"
             duration: 120
-    addons: {}
+    addons: { }
     environments:
       test:
         services:
@@ -612,16 +619,15 @@ spec:
               max_mem: 256
             deployments:
               replicas: 1
-
   uc:
     version: "2.0"
     services:
       uc:
-        image: registry.erda.cloud/erda/uc:dice-4.0-20210630-f4d63b99
+        image: {{ .Values.global.image.repository }}/uc:dice-4.0-20210630-f4d63b99
         ports:
-        - 8080
+          - 8080
         envs:
-          REDIRECT_URL_WHITE_LIST: http://uc.{{ .Values.domain }}/oauth/authorize,http://uc.{{ .Values.domain }}/oauth/authorize,https://uc.{{ .Values.domain }}/oauth/authorize
+          REDIRECT_URL_WHITE_LIST: http://uc.{{ .Values.erda.domain }}/oauth/authorize,http://uc.{{ .Values.erda.domain }}/oauth/authorize,https://uc.{{ .Values.erda.domain }}/oauth/authorize
           SPRING_PROFILES_ACTIVE: docker
           SMS_ENABLE_NOTICE_MOCK: "false"
           JAVA_OPTS: -Xms1433m -Xmx1433m
@@ -642,8 +648,8 @@ spec:
             path: /health
             duration: 300
         expose:
-        - 8080
-    
+          - 8080
+
     environments:
       test:
         services:
@@ -655,10 +661,9 @@ spec:
               max_mem: 2048
             deployments:
               replicas: 1
-
   spotAnalyzer:
     version: "2.0"
-    meta: {}
+    meta: { }
     envs:
       AKKA_ASK_TIMEOUT: 60s
       AKKA_FRAMESIZE: 268435456b
@@ -675,17 +680,17 @@ spec:
       TASK_MANAGER_NUMBER_OF_TASK_SLOTS: "2"
     services:
       analyzer-alert:
-        image: registry.erda.cloud/erda/erda-analyzer-alert:4.0.0-20210615-9f62286
+        image: {{ .Values.global.image.repository }}/erda-analyzer-alert:4.0.0-20210615-9f62286
         cmd: flink-entrypoint.sh jobcluster --job-classname cloud.erda.analyzer.alert.Main
         ports:
-        - port: 8081
-          protocol: TCP
-        - port: 6123
-          protocol: TCP
-        - port: 6124
-          protocol: TCP
-        - port: 6125
-          protocol: TCP
+          - port: 8081
+            protocol: TCP
+          - port: 6123
+            protocol: TCP
+          - port: 6124
+            protocol: TCP
+          - port: 6125
+            protocol: TCP
         envs:
           GROUP_ID: spot-analyzer-alert
           JOB_MANAGER_NAME: self
@@ -718,17 +723,17 @@ spec:
             port: 8081
             path: /jobmanager/config
             duration: 120
-          exec: {}
+          exec: { }
       analyzer-alert-task:
-        image: registry.erda.cloud/erda/erda-analyzer-alert:4.0.0-20210615-9f62286
+        image: {{ .Values.global.image.repository }}/erda-analyzer-alert:4.0.0-20210615-9f62286
         cmd: flink-entrypoint.sh taskmanager
         ports:
-        - port: 6123
-          protocol: TCP
-        - port: 6124
-          protocol: TCP
-        - port: 6125
-          protocol: TCP
+          - port: 6123
+            protocol: TCP
+          - port: 6124
+            protocol: TCP
+          - port: 6125
+            protocol: TCP
         envs:
           JOB_MANAGER_NAME: analyzer_alert
           TASK_MANAGER_MEMORY_PROCESS_SIZE: 1843m
@@ -748,22 +753,22 @@ spec:
         depends_on:
           - analyzer-alert
         health_check:
-          http: {}
+          http: { }
           exec:
             cmd: ps aux | grep TaskManagerRunner || exit 1
             duration: 120
       analyzer-error-insight:
-        image: registry.erda.cloud/erda/erda-analyzer-error-insight:4.0.0-20210615-9f62286
+        image: {{ .Values.global.image.repository }}/erda-analyzer-error-insight:4.0.0-20210615-9f62286
         cmd: flink-entrypoint.sh jobcluster --job-classname cloud.erda.analyzer.errorInsight.Main
         ports:
-        - port: 8081
-          protocol: TCP
-        - port: 6123
-          protocol: TCP
-        - port: 6124
-          protocol: TCP
-        - port: 6125
-          protocol: TCP
+          - port: 8081
+            protocol: TCP
+          - port: 6123
+            protocol: TCP
+          - port: 6124
+            protocol: TCP
+          - port: 6125
+            protocol: TCP
         envs:
           CASSANDRA_BATCHSIZE: "10"
           GROUP_ID: spot-analyzer-error-insight
@@ -789,17 +794,17 @@ spec:
             port: 8081
             path: /jobmanager/config
             duration: 120
-          exec: {}
+          exec: { }
       analyzer-error-insight-task:
-        image: registry.erda.cloud/erda/erda-analyzer-error-insight:4.0.0-20210615-9f62286
+        image: {{ .Values.global.image.repository }}/erda-analyzer-error-insight:4.0.0-20210615-9f62286
         cmd: flink-entrypoint.sh taskmanager
         ports:
-        - port: 6123
-          protocol: TCP
-        - port: 6124
-          protocol: TCP
-        - port: 6125
-          protocol: TCP
+          - port: 6123
+            protocol: TCP
+          - port: 6124
+            protocol: TCP
+          - port: 6125
+            protocol: TCP
         envs:
           JOB_MANAGER_NAME: analyzer_error_insight
           TASK_MANAGER_MEMORY_PROCESS_SIZE: 1843m
@@ -819,22 +824,22 @@ spec:
         depends_on:
           - analyzer-error-insight
         health_check:
-          http: {}
+          http: { }
           exec:
             cmd: ps aux | grep TaskManagerRunner || exit 1
             duration: 120
       analyzer-metrics:
-        image: registry.erda.cloud/erda/erda-analyzer-metrics:4.0.0-20210607-a14eed0
+        image: {{ .Values.global.image.repository }}/erda-analyzer-metrics:4.0.0-20210607-a14eed0
         cmd: flink-entrypoint.sh jobcluster --job-classname cloud.erda.analyzer.metrics.Main
         ports:
-        - port: 8081
-          protocol: TCP
-        - port: 6123
-          protocol: TCP
-        - port: 6124
-          protocol: TCP
-        - port: 6125
-          protocol: TCP
+          - port: 8081
+            protocol: TCP
+          - port: 6123
+            protocol: TCP
+          - port: 6124
+            protocol: TCP
+          - port: 6125
+            protocol: TCP
         envs:
           GROUP_ID: spot-analyzer-metrics
           JOB_MANAGER_NAME: self
@@ -865,17 +870,17 @@ spec:
             port: 8081
             path: /jobmanager/config
             duration: 120
-          exec: {}
+          exec: { }
       analyzer-metrics-task:
-        image: registry.erda.cloud/erda/erda-analyzer-metrics:4.0.0-20210607-a14eed0
+        image: {{ .Values.global.image.repository }}/erda-analyzer-metrics:4.0.0-20210607-a14eed0
         cmd: flink-entrypoint.sh taskmanager
         ports:
-        - port: 6123
-          protocol: TCP
-        - port: 6124
-          protocol: TCP
-        - port: 6125
-          protocol: TCP
+          - port: 6123
+            protocol: TCP
+          - port: 6124
+            protocol: TCP
+          - port: 6125
+            protocol: TCP
         envs:
           JOB_MANAGER_NAME: analyzer_metrics
           TASK_MANAGER_MEMORY_PROCESS_SIZE: 1843m
@@ -895,11 +900,11 @@ spec:
         depends_on:
           - analyzer-metrics
         health_check:
-          http: {}
+          http: { }
           exec:
             cmd: ps aux | grep TaskManagerRunner || exit 1
             duration: 120
-    addons: {}
+    addons: { }
     environments:
       test:
         envs:
@@ -932,203 +937,19 @@ spec:
           analyzer-metrics-task:
             deployments:
               replicas: 1
-  spotTelegraf:
-    version: "2"
-    meta: {}
-    envs: {}
-    services:
-      telegraf:
-        image: registry.erda.cloud/erda/telegraf:4.0-20210527-a8a0005
-        ports:
-        - port: 8090
-          protocol: TCP
-          l4_protocol: TCP
-          expose: false
-          default: false
-        envs:
-          CLUSTER_PATH: /rootfs/etc/cluster-node
-          COLLECTOR_AUTH_PASSWORD: G$9767bP32drYFPWrK4XMLRMTatiM6cU
-          COLLECTOR_AUTH_USERNAME: collector
-          HOST_ETC: /rootfs/etc
-          HOST_MOUNT_PREFIX: /rootfs
-          HOST_PROC: /rootfs/proc
-          HOST_SYS: /rootfs/sys
-          HPROF_OUTPUT_PATH: /rootfs/tmp
-          INPUT_DOCKER_TAG_KEYS: '[''DICE_*'', ''N?_DICE_*'', ''EDAS_*'', ''ADDON_ID'', ''N?_ADDON_ID'', ''TERMINUS_KEY'', ''TERMINUS_DEFINE_TAG'', ''MESOS_TASK_ID'', ''POD_IP'', ''io.kubernetes.pod.name'', ''io.kubernetes.pod.namespace'', ''io.kubernetes.pod.uid'']'
-          INPUT_METASERVER_FIELD_KEYS: '[''DICE_*'', ''N?_DICE_*'', ''EDAS_*'', ''TERMINUS_DEFINE_TAG'', ''POD_IP'', ''io.kubernetes.pod.name'', ''io.kubernetes.pod.namespace'']'
-          SADC_PATH: /usr/lib64/sa/sadc
-          SADF_PATH: /usr/bin/sadf
-          TELEGRAF_PPROF_PORT: "6962"
-        resources:
-          cpu: 0.01
-          mem: 100
-          max_cpu: 1
-          max_mem: 2048
-          network:
-              mode: host
-        binds:
-          - /:/rootfs:ro
-          - /tmp:/rootfs/tmp:rw
-          - /run/udev:/run/udev:ro
-        deployments:
-          replicas: 1
-          labels:
-            GROUP: spot-v2
-            PRIVILEGED: "true"
-        depends_on:
-        - collector
-        - telegraf-platform
-        health_check:
-          exec:
-            cmd: ps aux | grep telegraf || exit 1
-            duration: 120
-      telegraf-app:
-        image: registry.erda.cloud/erda/telegraf:4.0-20210527-a8a0005
-        ports:
-        - port: 8091
-          protocol: TCP
-          l4_protocol: TCP
-          expose: false
-          default: false
-        envs:
-          CLUSTER_PATH: /rootfs/etc/cluster-node
-          COLLECTOR_AUTH_PASSWORD: G$9767bP32drYFPWrK4XMLRMTatiM6cU
-          COLLECTOR_AUTH_USERNAME: collector
-          TELEGRAF_CONFIG: telegraf-app
-          TELEGRAF_PPROF_PORT: "6963"
-        resources:
-          cpu: 0.01
-          mem: 100
-          max_cpu: 1
-          max_mem: 2048
-          network:
-              mode: host
-        binds:
-          - /:/rootfs:ro
-        deployments:
-          replicas: 1
-          labels:
-            GROUP: spot-v2
-            PRIVILEGED: "true"
-        depends_on:
-        - collector
-        health_check:
-          exec:
-            cmd: ps aux | grep telegraf || exit 1
-            duration: 120
-      telegraf-platform:
-        image: registry.erda.cloud/erda/telegraf:4.0-20210527-a8a0005
-        ports:
-        - port: 8092
-          protocol: TCP
-          l4_protocol: TCP
-          expose: false
-          default: false
-        - port: 8094
-          protocol: UDP
-          l4_protocol: UDP
-          expose: false
-          default: false
-        - port: 8095
-          protocol: TCP
-          l4_protocol: TCP
-          expose: false
-          default: false
-        - port: 6963
-          protocol: TCP
-          l4_protocol: TCP
-          expose: false
-          default: false
-        - port: 7180
-          protocol: TCP
-          l4_protocol: TCP
-          expose: false
-          default: false
-        envs:
-          CASSANDRA_EXPORTER_JMX_ADDR: addon-cassandra-exporter-jmx.default.svc.cluster.local
-          CASSANDRA_JOLOKIA_PORT: "8778"
-          CLUSTER_PATH: /rootfs/etc/cluster-node
-          COLLECTOR_AUTH_PASSWORD: G$9767bP32drYFPWrK4XMLRMTatiM6cU
-          COLLECTOR_AUTH_USERNAME: collector
-          HOST_ETC: /rootfs/etc
-          HOST_MOUNT_PREFIX: /rootfs
-          HOST_PROC: /rootfs/proc
-          HOST_SYS: /rootfs/sys
-          HPROF_OUTPUT_PATH: /rootfs/tmp
-          KAFKA_JOLOKIA_PORT: "8778"
-          TELEGRAF_CONFIG: platform.alone
-          TELEGRAF_PPROF_PORT: "6964"
-          TERMINUS_LOG_COLLECT: "false"
-        resources:
-          cpu: 0.01
-          mem: 100
-          max_cpu: 1
-          max_mem: 2048
-        binds:
-          - /:/rootfs:ro
-          - /netdata/dice-ops/dice-config/certificates:/netdata/dice-ops/dice-config/certificates:ro
-        deployments:
-          replicas: 1
-          labels:
-              GROUP: spot-v2
-              PRIVILEGED: "true"
-        depends_on:
-        - collector
-        health_check:
-          exec:
-            cmd: ps aux | grep telegraf || exit 1
-            duration: 120
-    addons: {}
-
-  spotFilebeat:
-    version: "2.0"
-    meta: {}
-    envs: {}
-    services:
-      filebeat:
-        image: registry.erda.cloud/erda/filebeat:4.0.0-20210422-5b97371
-        envs:
-          DOCKER_SOCK_PATH: unix:///rootfs/var/run/docker.sock
-          COLLECTOR_AUTH_PASSWORD: G$9767bP32drYFPWrK4XMLRMTatiM6cU
-          COLLECTOR_AUTH_USERNAME: collector
-        resources:
-          cpu: 0.01
-          mem: 100
-          max_cpu: 1
-          max_mem: 2048
-          network:
-            mode: container
-        binds:
-        - /var/lib/docker/containers:/var/lib/docker/containers:ro
-        - /data/kube-apiserver/audit-logs:/data/kube-apiserver/audit-logs:ro
-        - /data/spot-v2/filebeat:/data/spot/filebeat:rw
-        - /var/run:/rootfs/var/run:ro
-        deployments:
-          replicas: 1
-          labels:
-            GROUP: spot-v2
-        depends_on:
-        - collector
-        health_check:
-          http: {}
-          exec:
-            cmd: ps aux | grep filebeat || exit 1
-            duration: 120
-    addons: {}
-
   tmc:
     version: "2.0"
-    meta: {}
-    envs: {}
+    meta: { }
+    envs: { }
     services:
       tmc:
-        image: registry.erda.cloud/erda/tmc:4.0.0-20210611-95bcc05
+        image: {{ .Values.global.image.repository }}/tmc:4.0.0-20210611-95bcc05
         ports:
-        - port: 8050
-          protocol: TCP
-          l4_protocol: TCP
-          expose: false
-          default: false
+          - port: 8050
+            protocol: TCP
+            l4_protocol: TCP
+            expose: false
+            default: false
         envs:
           ERDA_VERSION: "1.0"
           ADDON_MONITOR_REGISTER: "false"
@@ -1144,27 +965,27 @@ spec:
           network:
             mode: container
         binds:
-        - /netdata/tmc:/tmc:rw
+          - /netdata/tmc:/tmc:rw
         deployments:
           replicas: 1
           labels:
             GROUP: addons
         depends_on:
-        - collector
-        - cmdb
-        - scheduler
-        - orchestrator
-        - dicehub
-        - ui
-        - monitor
-        - hepa
-        - eventbox
-        - mesh-controller
-        - soldier
+          - collector
+          - cmdb
+          - scheduler
+          - orchestrator
+          - dicehub
+          - ui
+          - monitor
+          - hepa
+          - eventbox
+          - mesh-controller
+          - soldier
         health_check:
-          http: {}
-          exec: {}
-    addons: {}
+          http: { }
+          exec: { }
+    addons: { }
     environments:
       test:
         services:
@@ -1174,21 +995,20 @@ spec:
               mem: 100
               max_cpu: 1
               max_mem: 2048
-
   hepa:
     version: "2.0"
-    meta: {}
-    envs: {}
+    meta: { }
+    envs: { }
     services:
       hepa:
         cmd: /app/hepa
-        image: registry.erda.cloud/erda/erda:4.0-20210521-3a995ee
+        image: {{ .Values.global.image.repository }}/erda:4.0-20210521-3a995ee
         ports:
-        - port: 8080
-          protocol: TCP
-          l4_protocol: TCP
-          expose: true
-          default: false
+          - port: 8080
+            protocol: TCP
+            l4_protocol: TCP
+            expose: true
+            default: false
         resources:
           cpu: 0.01
           mem: 100
@@ -1201,42 +1021,41 @@ spec:
           labels:
             GROUP: addons
         depends_on:
-        - cmdb
-        - scheduler
-        - monitor
-        - orchestrator
-        - dicehub
-        - eventbox
-        - ops
+          - cmdb
+          - scheduler
+          - monitor
+          - orchestrator
+          - dicehub
+          - eventbox
+          - ops
         expose:
-        - 8080
+          - 8080
         health_check:
           http:
             port: 8080
             path: /api/gateway/health/check
             duration: 120
-          exec: {}
-    addons: {}
-
+          exec: { }
+    addons: { }
   spotMonitor:
     version: "2"
-    meta: {}
-    envs: {}
+    meta: { }
+    envs: { }
     services:
       collector:
-        image: registry.erda.cloud/erda/erda:4.0-20210510-73c6b42
+        image: {{ .Values.global.image.repository }}/erda:4.0-20210510-73c6b42
         cmd: /app/collector
         ports:
-        - port: 7076
-          protocol: TCP
-          l4_protocol: TCP
-          expose: false
-          default: false
-        - port: 7098
-          protocol: TCP
-          l4_protocol: TCP
-          expose: false
-          default: false
+          - port: 7076
+            protocol: TCP
+            l4_protocol: TCP
+            expose: false
+            default: false
+          - port: 7098
+            protocol: TCP
+            l4_protocol: TCP
+            expose: false
+            default: false
         envs:
           COLLECTOR_BROWSER_SAMPLING_RATE: "100"
           COLLECTOR_ENABLE: "true"
@@ -1250,7 +1069,7 @@ spec:
           labels:
             GROUP: spot-v2
         expose:
-        - 7076
+          - 7076
         health_check:
           http:
             port: 7076
@@ -1258,18 +1077,18 @@ spec:
             duration: 120
       monitor:
         cmd: /app/monitor
-        image: registry.erda.cloud/erda/erda:4.0-20210618-d793669
+        image: {{ .Values.global.image.repository }}/erda:4.0-20210618-d793669
         ports:
-        - port: 7096
-          protocol: TCP
-          l4_protocol: TCP
-          expose: false
-          default: false
-        - port: 7098
-          protocol: TCP
-          l4_protocol: TCP
-          expose: false
-          default: false
+          - port: 7096
+            protocol: TCP
+            l4_protocol: TCP
+            expose: false
+            default: false
+          - port: 7098
+            protocol: TCP
+            l4_protocol: TCP
+            expose: false
+            default: false
         envs:
           BROWSER_ENABLE: "true"
           BROWSER_GROUP_ID: spot-monitor-browser
@@ -1290,13 +1109,13 @@ spec:
           labels:
             GROUP: spot-v2
         depends_on:
-        - openapi
-        - scheduler
-        - cmdb
-        - pipeline
-        - ui
-        - ops
-        - collector
+          - openapi
+          - scheduler
+          - cmdb
+          - pipeline
+          - ui
+          - ops
+          - collector
         health_check:
           http:
             port: 7096
@@ -1304,18 +1123,18 @@ spec:
             duration: 120
       streaming:
         cmd: /app/streaming
-        image: registry.erda.cloud/erda/erda:4.0-20210519-37c67ed
+        image: {{ .Values.global.image.repository }}/erda:4.0-20210519-37c67ed
         ports:
-        - port: 7091
-          protocol: TCP
-          l4_protocol: TCP
-          expose: false
-          default: false
-        - port: 7098
-          protocol: TCP
-          l4_protocol: TCP
-          expose: false
-          default: false
+          - port: 7091
+            protocol: TCP
+            l4_protocol: TCP
+            expose: false
+            default: false
+          - port: 7098
+            protocol: TCP
+            l4_protocol: TCP
+            expose: false
+            default: false
         envs:
           BROWSER_ENABLE: "true"
           BROWSER_GROUP_ID: spot-monitor-browser
@@ -1344,16 +1163,200 @@ spec:
           labels:
             GROUP: spot-v2
         depends_on:
-        - openapi
-        - scheduler
-        - cmdb
-        - pipeline
-        - ui
-        - ops
-        - collector
+          - openapi
+          - scheduler
+          - cmdb
+          - pipeline
+          - ui
+          - ops
+          - collector
         health_check:
           http:
             port: 7091
             path: /api/health
             duration: 120
-    addons: {}
+    addons: { }
+  {{- end }}
+
+  spotTelegraf:
+    version: "2"
+    meta: { }
+    envs: { }
+    services:
+      telegraf:
+        image: {{ .Values.global.image.repository }}/telegraf:4.0-20210527-a8a0005
+        ports:
+          - port: 8090
+            protocol: TCP
+            l4_protocol: TCP
+            expose: false
+            default: false
+        envs:
+          CLUSTER_PATH: /rootfs/etc/cluster-node
+          COLLECTOR_AUTH_PASSWORD: G$9767bP32drYFPWrK4XMLRMTatiM6cU
+          COLLECTOR_AUTH_USERNAME: collector
+          HOST_ETC: /rootfs/etc
+          HOST_MOUNT_PREFIX: /rootfs
+          HOST_PROC: /rootfs/proc
+          HOST_SYS: /rootfs/sys
+          HPROF_OUTPUT_PATH: /rootfs/tmp
+          INPUT_DOCKER_TAG_KEYS: '[''DICE_*'', ''N?_DICE_*'', ''EDAS_*'', ''ADDON_ID'', ''N?_ADDON_ID'', ''TERMINUS_KEY'', ''TERMINUS_DEFINE_TAG'', ''MESOS_TASK_ID'', ''POD_IP'', ''io.kubernetes.pod.name'', ''io.kubernetes.pod.namespace'', ''io.kubernetes.pod.uid'']'
+          INPUT_METASERVER_FIELD_KEYS: '[''DICE_*'', ''N?_DICE_*'', ''EDAS_*'', ''TERMINUS_DEFINE_TAG'', ''POD_IP'', ''io.kubernetes.pod.name'', ''io.kubernetes.pod.namespace'']'
+          SADC_PATH: /usr/lib64/sa/sadc
+          SADF_PATH: /usr/bin/sadf
+          TELEGRAF_PPROF_PORT: "6962"
+        resources:
+          cpu: 0.01
+          mem: 100
+          max_cpu: 1
+          max_mem: 2048
+          network:
+            mode: host
+        binds:
+          - /:/rootfs:ro
+          - /tmp:/rootfs/tmp:rw
+          - /run/udev:/run/udev:ro
+        deployments:
+          replicas: 1
+          labels:
+            GROUP: spot-v2
+            PRIVILEGED: "true"
+        depends_on:
+          - collector
+          - telegraf-platform
+        health_check:
+          exec:
+            cmd: ps aux | grep telegraf || exit 1
+            duration: 120
+      telegraf-app:
+        image: {{ .Values.global.image.repository }}/telegraf:4.0-20210527-a8a0005
+        ports:
+          - port: 8091
+            protocol: TCP
+            l4_protocol: TCP
+            expose: false
+            default: false
+        envs:
+          CLUSTER_PATH: /rootfs/etc/cluster-node
+          COLLECTOR_AUTH_PASSWORD: G$9767bP32drYFPWrK4XMLRMTatiM6cU
+          COLLECTOR_AUTH_USERNAME: collector
+          TELEGRAF_CONFIG: telegraf-app
+          TELEGRAF_PPROF_PORT: "6963"
+        resources:
+          cpu: 0.01
+          mem: 100
+          max_cpu: 1
+          max_mem: 2048
+          network:
+            mode: host
+        binds:
+          - /:/rootfs:ro
+        deployments:
+          replicas: 1
+          labels:
+            GROUP: spot-v2
+            PRIVILEGED: "true"
+        depends_on:
+          - collector
+        health_check:
+          exec:
+            cmd: ps aux | grep telegraf || exit 1
+            duration: 120
+      telegraf-platform:
+        image: {{ .Values.global.image.repository }}/telegraf:4.0-20210527-a8a0005
+        ports:
+          - port: 8092
+            protocol: TCP
+            l4_protocol: TCP
+            expose: false
+            default: false
+          - port: 8094
+            protocol: UDP
+            l4_protocol: UDP
+            expose: false
+            default: false
+          - port: 8095
+            protocol: TCP
+            l4_protocol: TCP
+            expose: false
+            default: false
+          - port: 6963
+            protocol: TCP
+            l4_protocol: TCP
+            expose: false
+            default: false
+          - port: 7180
+            protocol: TCP
+            l4_protocol: TCP
+            expose: false
+            default: false
+        envs:
+          CASSANDRA_EXPORTER_JMX_ADDR: addon-cassandra-exporter-jmx.default.svc.cluster.local
+          CASSANDRA_JOLOKIA_PORT: "8778"
+          CLUSTER_PATH: /rootfs/etc/cluster-node
+          COLLECTOR_AUTH_PASSWORD: G$9767bP32drYFPWrK4XMLRMTatiM6cU
+          COLLECTOR_AUTH_USERNAME: collector
+          HOST_ETC: /rootfs/etc
+          HOST_MOUNT_PREFIX: /rootfs
+          HOST_PROC: /rootfs/proc
+          HOST_SYS: /rootfs/sys
+          HPROF_OUTPUT_PATH: /rootfs/tmp
+          KAFKA_JOLOKIA_PORT: "8778"
+          TELEGRAF_CONFIG: platform.alone
+          TELEGRAF_PPROF_PORT: "6964"
+          TERMINUS_LOG_COLLECT: "false"
+        resources:
+          cpu: 0.01
+          mem: 100
+          max_cpu: 1
+          max_mem: 2048
+        binds:
+          - /:/rootfs:ro
+          - /netdata/dice-ops/dice-config/certificates:/netdata/dice-ops/dice-config/certificates:ro
+        deployments:
+          replicas: 1
+          labels:
+            GROUP: spot-v2
+            PRIVILEGED: "true"
+        depends_on:
+          - collector
+        health_check:
+          exec:
+            cmd: ps aux | grep telegraf || exit 1
+            duration: 120
+    addons: { }
+  spotFilebeat:
+    version: "2.0"
+    meta: { }
+    envs: { }
+    services:
+      filebeat:
+        image: {{ .Values.global.image.repository }}/filebeat:4.0.0-20210422-5b97371
+        envs:
+          DOCKER_SOCK_PATH: unix:///rootfs/var/run/docker.sock
+          COLLECTOR_AUTH_PASSWORD: G$9767bP32drYFPWrK4XMLRMTatiM6cU
+          COLLECTOR_AUTH_USERNAME: collector
+        resources:
+          cpu: 0.01
+          mem: 100
+          max_cpu: 1
+          max_mem: 2048
+          network:
+            mode: container
+        binds:
+          - /var/lib/docker/containers:/var/lib/docker/containers:ro
+          - /data/kube-apiserver/audit-logs:/data/kube-apiserver/audit-logs:ro
+          - /data/spot-v2/filebeat:/data/spot/filebeat:rw
+          - /var/run:/rootfs/var/run:ro
+        deployments:
+          replicas: 1
+          labels:
+            GROUP: spot-v2
+        depends_on:
+          - collector
+        health_check:
+          http: { }
+          exec:
+            cmd: ps aux | grep filebeat || exit 1
+            duration: 120
+    addons: { }

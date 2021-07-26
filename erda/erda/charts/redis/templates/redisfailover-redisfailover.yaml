@@ -6,7 +6,11 @@ metadata:
 spec:
   sentinel:
     image: {{ .Values.global.image.repository }}/{{ .Values.redisFailover.name | default "addon-redis" }}:{{ .Values.redisFailover.version }}
-    replicas: {{ .Values.redisFailover.sentinel.repilcas | default 1 }}
+    {{- if eq .Values.global.size "prod" }}
+    replicas: {{ .Values.redisFailover.sentinel.replicas | default 3 }}
+    {{- else }}
+    replicas: {{ .Values.redisFailover.sentinel.replicas | default 1 }}
+    {{- end }}
     tolerations:
       - operator: Exists
     affinity:
@@ -32,7 +36,11 @@ spec:
     - "failover-timeout 12000"
   redis:
     image: {{ .Values.global.image.repository }}/{{ .Values.redisFailover.name | default "addon-redis" }}:{{ .Values.redisFailover.version }}
-    replicas: {{ .Values.redisFailover.sentinel.repilcas | default 1 }}
+    {{- if eq .Values.global.size "prod" }}
+    replicas: {{ .Values.redisFailover.redis.replicas | default 2 }}
+    {{- else }}
+    replicas: {{ .Values.redisFailover.redis.replicas | default 1 }}
+    {{- end }}
     tolerations:
       - operator: Exists
     affinity:

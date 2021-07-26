@@ -1,3 +1,11 @@
+global:
+  size: demo
+  namespace: default
+  image:
+    repository: registry.erda.cloud/erda
+    imagePullPolicy: IfNotPresent
+  imagePullSecrets: [ ]
+
 redisOperator:
   name: redis-operator
   version: 1.0.0-20200723-1a7a9f14
@@ -14,7 +22,7 @@ redisFailover:
   version: 3.2.12
   secret: aUVWSUk2TFk2RWJyYzRIWA==
   redis:
-    replicas: 1
+    replicas:
     resources:
       requests:
         cpu:
@@ -23,7 +31,7 @@ redisFailover:
         cpu:
         memory:
   sentinel:
-    replicas: 1
+    replicas:
     resources:
       requests:
         cpu:

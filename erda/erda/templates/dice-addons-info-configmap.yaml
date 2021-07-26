@@ -1,4 +1,8 @@
 apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dice-addons-info
+  namespace: {{ .Values.global.namespace | default "erda-system" }}
 data:
   BOOTSTRAP_SERVERS: {{ .Values.kafka.name | default "addon-kafka" }}.{{ .Values.global.namespace | default "erda-system"}}.svc.cluster.local:9092
   CASSANDRA_ADDR: {{ .Values.cassandra.name | default "addon-cassandra" }}.{{ .Values.global.namespace | default "erda-system"}}.svc.cluster.local
@@ -7,31 +11,55 @@ data:
   ES_SECURITY_PASSWORD: ""
   ES_SECURITY_USERNAME: ""
   ES_URL: http://{{ .Values.elasticsearch.name | default "addon-elasticsearch" }}.{{ .Values.global.namespace | default "erda-system"}}.svc.cluster.local:9200
-  KMS_ADDR: {{ .Values.kms.name | default "addon-kms" }}.{{ .Values.global.namespace | default "erda-system"}}.svc.cluster.local:3082
   MYSQL_DATABASE: {{ .Values.mysql.database }}
   MYSQL_HOST: {{ .Values.mysql.name | default "erda-mysql" }}.{{ .Values.global.namespace | default "erda-system"}}.svc.cluster.local
   MYSQL_PASSWORD: {{ .Values.mysql.password }}
   MYSQL_PORT: "3306"
   MYSQL_USERNAME: {{ .Values.mysql.user }}
-  NETPORTAL_ADDR: netportal.{{ .Values.global.namespace | default "erda-system"}}.svc.cluster.local:80
-  NEXUS_ADDR: {{ .Values.nexus.name | default "addon-nexus" }}.{{ .Values.global.namespace | default "erda-system"}}.svc.cluster.local:8081
-  NEXUS_PASSWORD: admin123
-  NEXUS_PUBLIC_URL: http://nexus-sys.{{ .Values.domain }}
-  NEXUS_USERNAME: admin
+  KMS_ADDR: {{ .Values.kms.name | default "addon-kms" }}.{{ .Values.global.namespace | default "erda-system"}}.svc.cluster.local:3082
+  {{- if not .Values.nexus.custom.address }}
+  NEXUS_ADDR: {{ .Values.nexus.defaultAddress }}
+  {{- else }}
+  NEXUS_ADDR: {{ .Values.nexus.custom.address }}
+  {{- if .Values.nexus.custom.username }}
+  NEXUS_USERNAME: {{ .Values.nexus.custom.username }}
+  {{- end }}
+  {{- if .Values.nexus.custom.password }}
+  NEXUS_PASSWORD: {{ .Values.nexus.custom.password }}
+  {{- end }}
+  {{- end }}
+  # TODO: nexus_public_url need or not ?
+  NEXUS_PUBLIC_URL: http://nexus-sys.{{ .Values.erda.domain }}
   REDIS_MASTER_NAME: mymaster
   REDIS_PASSWORD: iEVII6LY6Ebrc4HX
-  REDIS_SENTINELS_ADDR: rfs-{{ .Values.redisFailover.name | default "addon-redis" }}.{{ .Values.global.namespace | default "erda-system"}}.svc.cluster.local:26379
+  REDIS_SENTINELS_ADDR: rfs-{{ .Values.redis.redisFailover.name | default "addon-redis" }}.{{ .Values.global.namespace | default "erda-system"}}.svc.cluster.local:26379
+  {{- if .Values.registry.custom.address }}
+  REGISTRY_ADDR: {{ .Values.registry.custom.address }}
+  {{- else }}
   {{- if eq .Values.registry.networkMode "host" }}
   REGISTRY_ADDR: {{ .Values.registry.hostURL }}
   {{- else }}
   REGISTRY_ADDR: {{ .Values.registry.name | default "addon-registry" }}.{{ .Values.global.namespace | default "erda-system" }}.svc.cluster.local:5000
   {{- end }}
+  {{- end }}
+  {{- if .Values.sonar.custom.address }}
+  {{- if .Values.sonar.custom.address }}
+  SONAR_ADDR: {{ .Values.sonar.custom.address }}
+  {{- end }}
+  {{- if .Values.sonar.custom.adminPassword }}
+  SONAR_ADMIN_PASSWORD: {{ .Values.sonar.custom.adminPassword }}
+  {{- end }}
+  {{- if .Values.sonar.custom.adminToken }}
+  SONAR_ADMIN_TOKEN: {{ .Values.sonar.custom.adminToken }}
+  {{- end }}
+  {{- if .Values.sonar.custom.address }}
+  # TODO: public url?
+  SONAR_PUBLIC_URL: {{ .Values.sonar.custom.address }}
+  {{- end }}
+  {{- else }}
   SONAR_ADDR: {{ .Values.sonar.name | default "addon-sonar" }}.{{ .Values.global.namespace | default "erda-system"}}.svc.cluster.local:9000
   SONAR_ADMIN_PASSWORD: 78tE846484lQQFUwY51h0Yr96ZQ063
   SONAR_ADMIN_TOKEN: LY9DepZ7iDUsyH8TFoDR85ok7y2nw1
-  SONAR_PUBLIC_URL: https://sonar-sys.{{ .Values.domain }}
+  SONAR_PUBLIC_URL: https://sonar-sys.{{ .Values.erda.domain }}
+  {{- end }}
   ZOOKEEPER_ADDR: {{ .Values.zookeeper.name | default "addon-zookeeper" }}.{{ .Values.global.namespace | default "erda-system"}}.svc.cluster.local:2181
-kind: ConfigMap
-metadata:
-  name: dice-addons-info
-  namespace: {{ .Values.global.namespace | default "erda-system" }}

@@ -4,14 +4,72 @@ version: 1.1.0
 appVersion: 1.1.0
 description: An open-source platform bases on Kubernetes that can deploy microservice applications.
 keywords:
-- Kubernetes
-- microservice
-- open-source
+  - Kubernetes
+  - microservice
+  - open-source
 home: https://www.erda.cloud/
 icon: https://github.com/erda-project/erda/raw/develop/docs/files/logo.jpg
 sources:
-- https://github.com/erda-project/erda
-- https://github.com/erda-project/erda-infra
-- https://github.com/erda-project/erda-ui
-engine: gotpl
+  - https://github.com/erda-project/erda
+  - https://github.com/erda-project/erda-infra
+  - https://github.com/erda-project/erda-ui
 type: application
+dependencies:
+  - name: cassandra
+    version: ~0.1.0
+    condition: cassandra.enabled
+    tags:
+      - master
+  - name: elasticsearch
+    version: ~0.1.0
+    condition: elasticsearch.enabled
+    tags:
+      - master
+  - name: etcd
+    version: ~0.1.0
+    condition: etcd.enabled
+    tags:
+      - master
+  - name: kafka
+    version: ~0.1.0
+    condition: kafka.enabled
+    tags:
+      - master
+  - name: mysql
+    version: ~0.1.0
+    condition: mysql.enabled
+    tags:
+      - master
+  - name: zookeeper
+    version: ~0.1.0
+    condition: zookeeper.enabled
+    tags:
+      - master
+  - name: kms
+    version: ~0.1.0
+    condition: kms.enabled
+    tags:
+      - master
+  - name: registry
+    version: ~0.1.0
+    condition: registry.enabled
+    tags:
+      - master
+      - work
+  - name: sonar
+    version: ~0.1.0
+    condition: sonar.enabled
+    tags:
+      - master
+  - name: volume-provisioner
+    version: ~0.1.0
+    condition: volume-provisioner.enabled
+    tags:
+      - master
+      - work
+  - name: redis
+    version: ~0.1.0
+    condition: redis.enabled
+    tags:
+      - master
+
