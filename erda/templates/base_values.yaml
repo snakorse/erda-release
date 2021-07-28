@@ -3,7 +3,6 @@ namespace: ${ERDA_NAMESPACE}
 image:
   repository: registry.erda.cloud/erda
   imagePullPolicy: IfNotPresent
-  
 
 redisOperator:
   name: redis-operator
@@ -32,14 +31,16 @@ elasticsearchOperator:
   version: 1.0.1
 
 erdaOperator:
-  name: erda-operator
-  version: 1.0.0-20210427-3d25066
+  name: dice-operator
+  version: v1.1-f08d3a78-20210728
 
 configmap:
   size: demo
   clustername: ${ERDA_CLUSTER_NAME}
   domain: ${ERDA_GENERIC_DOMAIN}
-  protocol: http
+  protocol:
+    port: 80
+    type: http
 
   ssh:
     user: root

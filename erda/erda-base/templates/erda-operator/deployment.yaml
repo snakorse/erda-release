@@ -24,7 +24,9 @@ spec:
         name: {{ .Values.erdaOperator.name | default "erda-operator" }}
         env:
         - name: ENABLE_AFFINITY
-          value: disable
+          value: "false"
+        - name: INJECT_CLUSTER_INFO
+          value: "false"
         - name: ERDA_CLUSTER_INFO
           value: dice-cluster-info
         - name: ERDA_ADDON_INFO

@@ -17,11 +17,6 @@ if [[ -z $ERDA_SIZE ]]; then
 	export ERDA_SIZE="demo"
 fi 
 
-# enable the netportal, `enable` and `disable` supported, default is `enable`
-if [[ -z $ERDA_NETPORTAL_ENABLE ]]; then
-	export ERDA_NETPORTAL_ENABLE=enable
-fi
-
 # set necessary label of erda to the Kubernetes, `enable` and `disable` supported, default is `enable`
 if [[ -z $ERDA_LABEL_ENABLE ]]; then
 	export ERDA_LABEL_ENABLE=enable
@@ -115,32 +110,6 @@ envsubst < ../templates/addons_values.yaml > ../erda-addons/values.yaml
 envsubst < ../templates/base_values.yaml > ../erda-base/values.yaml
 envsubst < ../templates/erda_values.yaml > ../erda/values.yaml
 
-# compose the netportal certificate authority files，client and server files temporary
-if [[ $ERDA_NETPORTAL_ENABLE != "" ]]; then
-
-	gen_ca netportal-ca netportal-ca
-	gen_client netportal-ca netportal-central netportal.terminus.io
-	gen_server netportal-ca netportal-edge netportal.terminus.io "" netportal.terminus.io
-
-	export KUBERNETES_CA=$(grep -F certificate-authority-data "$kubeconf" | awk '{print $2}')
-	export ADMIN_PEM=$(grep -F client-certificate-data "$kubeconf" | awk '{print $2}')
-	export ADMIN_KEY_PEM=$(grep -F client-key-data "$kubeconf" | awk '{print $2}')
-	export NETPORTAL_CA=`cat ${ssl_dir}/netportal-ca.pem | base64 | tr -d "\n"`
-	export NETPORTAL_EDGE=`cat ${ssl_dir}/netportal-edge.pem | base64 | tr -d "\n"`
-	export NETPORTAL_EDGE_KEY=`cat ${ssl_dir}/netportal-edge-key.pem | base64 | tr -d "\n"`
-	export NETPORTAL_CENTRAL=`cat ${ssl_dir}/netportal-central.pem | base64 | tr -d "\n"`
-	export NETPORTAL_CENTRAL_KEY=`cat ${ssl_dir}/netportal-central-key.pem | base64 | tr -d "\n"`
-
-	envsubst < ../templates/netportal.yaml > ../erda-addons/templates/ingress/netportal.yaml
-	envsubst < ../templates/netportal-admin.yaml > ../erda-addons/templates/ingress/netportal-admin.yaml
-	envsubst < ../templates/netportal-edge.yaml > ../erda-addons/templates/ingress/netportal-edge.yaml
-
-	kubectl delete -f ../templates/nginx_tlmp.yaml --ignore-not-found=true
-	kubectl create -f ../templates/nginx_tlmp.yaml
-
-fi
-
-
 # package the helm package
 rm -rf ${helm_package}
 mkdir ${helm_package}
@@ -149,4 +118,4 @@ helm package ../erda-base -d ${helm_package} --version $(cat ../VERSION)
 helm package ../erda-addons -d ${helm_package} --version $(cat ../VERSION)
 helm package ../erda -d ${helm_package} --version $(cat ../VERSION)
 
-kubectl delete job erda-init-image --ignore-not-found=true
+kubectl delete job dice-init-image --ignore-not-found=true

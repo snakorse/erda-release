@@ -4,10 +4,10 @@ metadata:
   name: {{ .Values.erdaOperator.name | default "erda-operator" }}
 rules:
 - apiGroups:
-  - erda.terminus.io
+  - dice.terminus.io
   resources:
-  - erdas
-  - erdas/status
+  - dices
+  - dices/status
   verbs:
   - '*'
 - apiGroups:
