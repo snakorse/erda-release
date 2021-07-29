@@ -1,0 +1,85 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: {{ .Values.name | default "addon-registry" }}
+  namespace: {{ .Values.global.namespace | default "erda-system" }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      dice/addon: {{ .Values.name | default "addon-registry" }}
+  template:
+    metadata:
+      labels:
+        dice/addon: {{ .Values.name | default "addon-registry" }}
+    spec:
+      volumes:
+        - name: bind1
+          persistentVolumeClaim:
+            claimName: data-{{ .Values.name | default "addon-registry" }}-pvc
+      containers:
+        - name: {{ .Values.name | default "addon-registry" }}
+          image:
+            {{ .Values.global.image.repository }}/{{ .Values.name | default "addon-registry" }}:{{ .Values.version }}
+          imagePullPolicy: {{ .Values.global.image.imagePullPolicy }}
+          ports:
+            - containerPort: 5000
+              protocol: TCP
+            - containerPort: 5050
+              protocol: TCP
+          env:
+            - name: DICE_ADDON
+              value: {{ .Values.name | default "addon-registry" }}
+            - name: REGISTRY_STORAGE_DELETE_ENABLED
+              value: 'true'
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: status.podIP
+            - name: HOST_IP
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: status.hostIP
+          resources:
+            requests:
+              cpu: {{ .Values.resources.requests.cpu | default "0.1" | quote }}
+              memory: {{ .Values.resources.requests.memory | default "10Mi" | quote }}
+            limits:
+              cpu: {{ .Values.resources.limits.cpu |  default "1" | quote }}
+              memory: {{ .Values.resources.limits.memory | default "1Gi" | quote }}
+          volumeMounts:
+            - name: bind1
+              mountPath: /var/lib/registry
+          livenessProbe:
+            tcpSocket:
+              port: 5000
+            initialDelaySeconds: 1
+            timeoutSeconds: 10
+            periodSeconds: 15
+            successThreshold: 1
+            failureThreshold: 9
+      {{- with .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+      {{- if eq .Values.networkMode "host" }}
+      hostNetwork: true
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - {{ .Values.hostNode }}
+      {{- end }}
+      tolerations:
+        - operator: Exists
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 50%
+      maxSurge: 100%

@@ -1,12 +1,20 @@
-kms:
-  name: addon-kms
-  version: 1.0.0-20200608-f11445f
-  replicas: 1
-  resources:
-    requests:
-      cpu:
-      memory:
-    limits:
-      cpu:
-      memory:
-  etcdEndpoints: https://erda-etcd.erda-system.svc.cluster.local:2379
+global:
+  namespace: default
+  size: demo
+  image:
+    repository: registry.erda.cloud/erda
+    imagePullPolicy: IfNotPresent
+  imagePullSecrets: [ ]
+
+name: addon-kms
+version: 1.0.0-20200608-f11445f
+replicas:
+resources:
+  requests:
+    cpu:
+    memory:
+  limits:
+    cpu:
+    memory:
+# TODO: register from values
+etcdEndpoints: https://erda-etcd.erda-system.svc.cluster.local:2379

@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.name | default "addon-sonar" }}
+  namespace: {{ .Values.global.namespace | default "erda-system" }}
+data:
+  SONAR_ADMIN_PASSWORD: {{ .Values.password }}
+  SONAR_ADMIN_TOKEN: {{ .Values.token }}

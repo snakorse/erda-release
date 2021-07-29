@@ -3,7 +3,7 @@ apiVersion: apps/v1
 metadata:
   labels:
     app: volume-provisioner
-  name: {{ .Values.volumeProvisoner.name | default "volume-provisioner" }}
+  name: {{ .Values.name | default "volume-provisioner" }}
   namespace: {{ .Values.global.namespace | default "erda-system" }}
 spec:
   selector:
@@ -13,13 +13,14 @@ spec:
     type: RollingUpdate
   template:
     metadata:
-      name: {{ .Values.volumeProvisoner.name | default "volume-provisioner" }}
+      name: {{ .Values.name | default "volume-provisioner" }}
       labels:
         app: volume-provisioner
     spec:
       serviceAccountName: volume-provisioner
       containers:
-        - image: {{ .Values.global.image.repository }}/{{ .Values.volumeProvisoner.name | default "volume-provisioner" }}:{{ .Values.volumeProvisoner.version }}
+        - image:
+            {{ .Values.global.image.repository }}/{{ .Values.name | default "volume-provisioner" }}:{{ .Values.version }}
           env:
             - name: PROVISIONER_NAMESPACE
               valueFrom:
@@ -45,13 +46,11 @@ spec:
         - name: host-dir
           hostPath:
             path: /
-      {{- if .Values.imagePullSecrets }}
-      {{- with .Values.imagePullSecrets }}
+      {{- with .Values.global.imagePullSecrets }}
       imagePullSecrets:
       {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- end }}
       tolerations:
-      - operator: Exists
+        - operator: Exists
 
 

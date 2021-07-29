@@ -1,26 +1,163 @@
-# TODO: global values
 global:
   namespace: default
+  size: demo
+  image:
+    repository: registry.erda.cloud/erda
+    imagePullPolicy: IfNotPresent
+  imagePullSecrets: [ ]
+# TODO: storage class in global control or not
+#  storageClass:
+#    local: dice-local-volume
+#    nfs: dice-nfs-volume
+
+# TODO: the ratio of request and limit with resources
+subscribeRatio: 1
+
+tags:
+  work: false
+  master: true
+
+erda:
+  clusterName: erda
+  domain:
+  masterClusterDomain:
+  operator:
+    name: erda-operator
+    version: 1.0.0-20210427-3d25066
   image:
     repository: registry.erda.cloud/erda/
     imagePullPolicy: IfNotPresent
+    components:
+      init: init-image:1.0.0-20210510-21a3c66
+      erda: erda:1.0.0-20210510-d7dd555
+      erdaUI: erda-ui:1.0.0-20210508-f228247
+      uc: erda-uc:1.0.0-20210425-d4c5a312
+      telegraf: telegraf:1.0.0-20210510-dc02a9d
+      analyzer:
+        error: erda-analyzer-error-insight:1.0.0-20210422-69e9f84
+        metrics: erda-analyzer-metrics:1.0.0-20210422-69e9f84
+        alert: erda-analyzer-alert:1.0.0-20210422-69e9f84
+      filebeat: filebeat:1.0.0-20210422-5b97371
+      tmc: tmc:1.0.0-20210429-b87d98a
+      soldier: soldier:1.0.0-20210426-daef74b
+  clusterConfig:
+    protocol: http
+    ssh:
+      user: root
+      password: ""
+    kubernetes:
+      version:
+      master:
+      mastervip:
+      lb:
 
-# TODO: old values for erda charts.
-namespace: default
+volume-provisioner:
+  name: volume-provisioner
+  version: 1.0.0-20210416-1a3758f
+  provisioner:
+    local: dice/local-volume
+    nfs: dice/netdata-volume
+  storageclass:
+    local: dice-local-volume
+    nfs: dice-nfs-volume
+  resources:
+    requests:
+      cpu:
+      memory:
+    limits:
+      cpu:
+      memory:
 
-image:
-  repository: registry.erda.cloud/erda/
-  imagePullPolicy: IfNotPresent
-  components:
-    init: init-image:1.0.0-20210510-21a3c66
-    erda: erda:1.0.0-20210510-d7dd555
-    erdaUI: erda-ui:1.0.0-20210508-f228247
-    uc: erda-uc:1.0.0-20210425-d4c5a312
-    telegraf: telegraf:1.0.0-20210510-dc02a9d
-    analyzer:
-      error: erda-analyzer-error-insight:1.0.0-20210422-69e9f84
-      metrics: erda-analyzer-metrics:1.0.0-20210422-69e9f84
-      alert: erda-analyzer-alert:1.0.0-20210422-69e9f84
-    filebeat: filebeat:1.0.0-20210422-5b97371
-    tmc: tmc:1.0.0-20210429-b87d98a
-    soldier: soldier:1.0.0-20210426-daef74b
+registry:
+  name: addon-registry
+  version: 2.7.1
+  resources:
+    requests:
+      cpu:
+      memory:
+    limits:
+      cpu:
+      memory:
+  storageClass: dice-local-volume
+  networkMode: ""
+  hostURL: ""
+  hostNode:
+  custom:
+    address:
+
+sonar:
+  name: addon-sonar
+  version: 8.4.2
+  token: LY9DepZ7iDUsyH8TFoDR85ok7y2nw1
+  password: 78tE846484lQQFUwY51h0Yr96ZQ063
+  ingressHost: "sonar.erda.io"
+  resources:
+    requests:
+      cpu:
+      memory:
+    limits:
+      cpu:
+      memory:
+  custom:
+    address:
+    adminPassword:
+    adminToken:
+
+kms:
+  name: addon-kms
+  version: 1.0.0-20200608-f11445f
+  replicas:
+  resources:
+    requests:
+      cpu:
+      memory:
+    limits:
+      cpu:
+      memory:
+  etcdEndpoints: https://erda-etcd.erda-system.svc.cluster.local:2379
+
+nexus:
+  defaultAddress: https://maven.aliyun.com/repository/public
+  custom:
+    address:
+    username:
+    password:
+
+redis:
+  redisOperator:
+    name: redis-operator
+    version: 1.0.0-20200723-1a7a9f14
+    resources:
+      requests:
+        cpu:
+        memory:
+      limits:
+        cpu:
+        memory:
+
+  redisFailover:
+    name: addon-redis
+    version: 3.2.12
+    secret: aUVWSUk2TFk2RWJyYzRIWA==
+    redis:
+      replicas:
+      resources:
+        requests:
+          cpu:
+          memory:
+        limits:
+          cpu:
+          memory:
+    sentinel:
+      replicas:
+      resources:
+        requests:
+          cpu:
+          memory:
+        limits:
+          cpu:
+          memory:
+  custom:
+    masterName:
+    password:
+    sentinelsAddress:

@@ -1,7 +1,7 @@
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: data-{{ .Values.registry.name | default "addon-registry" }}-pvc
+  name: data-{{ .Values.name | default "addon-registry" }}-pvc
   namespace: {{ .Values.global.namespace | default "erda-system" }}
 spec:
   accessModes:
@@ -9,4 +9,4 @@ spec:
   resources:
     requests:
       storage: 100Gi
-  storageClassName: {{ .Values.storageclass.local | default "erda-local-volume" }}
+  storageClassName: {{ .Values.storageClass | default "erda-local-volume" }}

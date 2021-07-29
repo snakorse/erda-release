@@ -1,13 +1,13 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: {{ .Values.erdaOperator.name | default "erda-operator" }}
+  name: {{ .Values.erda.operator.name | default "erda-operator" }}
 rules:
 - apiGroups:
-  - erda.terminus.io
+  - dice.terminus.io
   resources:
-  - erdas
-  - erdas/status
+  - dices
+  - dices/status
   verbs:
   - '*'
 - apiGroups:
@@ -37,6 +37,15 @@ rules:
   - namespaces
   verbs:
   - '*'
+- apiGroups:
+  - ""
+  resources:
+  - nodes/stats
+  - nodes/proxy
+  - nodes/metrics
+  verbs:
+  - get
+  - list
 - apiGroups:
   - apps
   resources:

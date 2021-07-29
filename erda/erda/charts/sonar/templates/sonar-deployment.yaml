@@ -1,32 +1,32 @@
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: {{ .Values.sonar.name | default "addon-sonar" }}
+  name: {{ .Values.name | default "addon-sonar" }}
   namespace: {{ .Values.global.namespace | default "erda-system" }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      dice/addon: {{ .Values.sonar.name | default "addon-sonar" }}
+      dice/addon: {{ .Values.name | default "addon-sonar" }}
   template:
     metadata:
       labels:
-        dice/addon: {{ .Values.sonar.name | default "addon-sonar" }}
+        dice/addon: {{ .Values.name | default "addon-sonar" }}
     spec:
       containers:
-      - name: {{ .Values.sonar.name | default "addon-sonar" }}
-        image:  {{ .Values.global.image.repository }}/{{ .Values.sonar.name | default "addon-sonar" }}:{{ .Values.sonar.version }}
+      - name: {{ .Values.name | default "addon-sonar" }}
+        image:  {{ .Values.global.image.repository }}/{{ .Values.name | default "addon-sonar" }}:{{ .Values.version }}
         imagePullPolicy: {{ .Values.global.image.imagePullPolicy }}
         ports:
         - containerPort: 9000
           protocol: TCP
         env:
         - name: SONAR_ADMIN_PASSWORD
-          value: {{ .Values.sonar.password }}
+          value: {{ .Values.password }}
         - name: SONAR_ADMIN_TOKEN
-          value: {{ .Values.sonar.token }}
+          value: {{ .Values.token }}
         - name: DICE_ADDON
-          value: {{ .Values.sonar.name | default "addon-sonar" }}
+          value: {{ .Values.name | default "addon-sonar" }}
         - name: POD_IP
           valueFrom:
             fieldRef:
@@ -39,11 +39,11 @@ spec:
               fieldPath: status.hostIP
         resources:
           requests:
-            cpu: {{ .Values.kms.resources.requests.cpu | default "0.1" | quote }}
-            memory: {{ .Values.kms.resources.requests.memory | default "10Mi" | quote }}
+            cpu: {{ .Values.resources.requests.cpu | default "0.1" | quote }}
+            memory: {{ .Values.resources.requests.memory | default "10Mi" | quote }}
           limits:
-            cpu: {{ .Values.kms.resources.limits.cpu |  default "1.5" | quote }}
-            memory: {{ .Values.kms.resources.limits.memory | default "3Gi" | quote }}
+            cpu: {{ .Values.resources.limits.cpu |  default "1.5" | quote }}
+            memory: {{ .Values.resources.limits.memory | default "3Gi" | quote }}
         livenessProbe:
           tcpSocket:
             port: 9000
@@ -52,11 +52,9 @@ spec:
           periodSeconds: 15
           successThreshold: 1
           failureThreshold: 9
-      {{- if .Values.imagePullSecrets }}
-      {{- with .Values.imagePullSecrets }}
+      {{- with .Values.global.imagePullSecrets }}
       imagePullSecrets:
       {{- toYaml . | nindent 8 }}
-      {{- end }}
       {{- end }}
       {{- if .Values.nodematchExpressions }}
       affinity:
