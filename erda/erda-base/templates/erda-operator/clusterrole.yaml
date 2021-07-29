@@ -38,6 +38,15 @@ rules:
   verbs:
   - '*'
 - apiGroups:
+  - ""
+  resources:
+  - nodes/stats
+  - nodes/proxy
+  - nodes/metrics
+  verbs:
+  - get
+  - list
+- apiGroups:
   - apps
   resources:
   - deployments
