@@ -202,7 +202,7 @@ spec:
           http: {}
           exec: {}
       cmp:
-        image: registry.erda.cloud/erda/dice/erda:1.1-20210723-07fea0c
+        image: registry.erda.cloud/erda/cmp:1.1-20210729-efc2b8a9
         cmd: /app/cmp
         ports:
         - port: 9027
