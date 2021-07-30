@@ -24,7 +24,7 @@ spec:
           MIGRATION_MYSQL_DBNAME: erda
           MIGRATION_DEBUGSQL: "false"
           MIGRATION_ERDA_LINT: "true"
-        image: registry.erda.cloud/erda/init-image:20210728-b017a3d
+        image: registry.erda.cloud/erda/init-image:20210730-ca1833c
         resources:
           cpu: 0.5
           mem: 128
