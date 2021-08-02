@@ -1,3 +1,12 @@
+global:
+  size: prod
+  namespace: default
+  image:
+    repository: registry.erda.cloud/erda
+    imagePullPolicy: IfNotPresent
+  imagePullSecrets: [ ]
+  storageClassName:
+
 etcd:
   name: erda-etcd
   version: 3.3.15-0

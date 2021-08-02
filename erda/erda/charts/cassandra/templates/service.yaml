@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.cassandra.operatorName | default "cassandra-operator" }}-metrics
+  namespace: {{ .Values.global.namespace | default "erda-system" }}
+  labels:
+    component: app
+    app: {{ .Values.cassandra.operatorName | default "cassandra-operator" }}-metrics
+spec:
+  selector:
+    app: {{ .Values.cassandra.operatorName | default "cassandra-operator" }}
+  ports:
+  - name: metrics
+    port: 9710
+    protocol: TCP
