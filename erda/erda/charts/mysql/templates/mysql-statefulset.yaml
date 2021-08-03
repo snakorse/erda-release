@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: {{ .Values.mysql.name | default "erda-mysql" }}
+  name: {{ .Values.mysql.name | default "erda-mysql" }}
+  namespace: {{ .Values.global.namespace | default "erda-system" }}
+spec:
+  podManagementPolicy: OrderedReady
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: {{ .Values.mysql.name | default "erda-mysql" }}
+  serviceName: {{ .Values.mysql.name | default "erda-mysql" }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.mysql.name | default "erda-mysql" }}
+    spec:
+      tolerations:
+        - operator: Exists
+      containers:
+        - name: {{ .Values.mysql.name | default "erda-mysql" }}
+          image: {{ .Values.global.image.repository }}/erda-mysql:{{ .Values.mysql.version }}
+          imagePullPolicy: IfNotPresent
+          env:
+          - name: MYSQL_ROOT_PASSWORD
+            value: {{ .Values.mysql.password }}
+          - name: MYSQL_DATABASE
+            value: {{ .Values.mysql.database }}
+          resources:
+            requests:
+              cpu: 10m
+              memory: 10Mi
+            limits:
+              cpu: 1
+              memory: 2Gi
+          ports:
+          - containerPort: 3306
+            name: mysql
+          volumeMounts:
+          - name: {{ .Values.mysql.name | default "erda-mysql" }}
+            mountPath: /data/mysql
+          - name: mysql-initdb
+            mountPath: /docker-entrypoint-initdb.d
+      volumes:
+      - name: mysql-initdb
+        configMap:
+          name: mysql-initdb-config
+  updateStrategy:
+    type: RollingUpdate
+  volumeClaimTemplates:
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      labels:
+        app: {{ .Values.mysql.name | default "erda-mysql" }}
+      name: {{ .Values.mysql.name | default "erda-mysql" }}
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 100Gi
+      storageClassName: {{ .Values.global.storageClassName | default "dice-local-volume" }}
+      volumeMode: Filesystem

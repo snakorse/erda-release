@@ -1,0 +1,110 @@
+{{- if eq .Values.global.size "demo" }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.etcd.name | default "erda-etcd" }}
+  namespace: {{ .Values.global.namespace | default "erda-system" }}
+spec:
+  ports:
+  - name: etcd-port
+    port: 2379
+    protocol: TCP
+    targetPort: 2379
+  - name: etcd-server-port
+    port: 2380
+    protocol: TCP
+    targetPort: 2380
+  selector:
+    app: {{ .Values.etcd.name | default "erda-etcd" }}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: {{ .Values.etcd.name | default "erda-etcd" }}
+  name: {{ .Values.etcd.name | default "erda-etcd" }}
+  namespace: {{ .Values.global.namespace | default "erda-system" }}
+spec:
+  podManagementPolicy: OrderedReady
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: {{ .Values.etcd.name | default "erda-etcd" }}
+  serviceName: {{ .Values.etcd.name | default "erda-etcd" }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.etcd.name | default "erda-etcd" }}
+    spec:
+      tolerations:
+        - operator: Exists
+      containers:
+        - name: {{ .Values.etcd.name | default "erda-etcd" }}
+          image: {{ .Values.global.image.repository}}/erda-etcd:{{ .Values.etcd.version }}
+          imagePullPolicy: IfNotPresent
+          command:
+          - etcd
+          - --enable-pprof=true
+          - --advertise-client-urls=https://{{ .Values.etcd.name | default "erda-etcd" }}.{{ .Values.global.namespace | default "erda-system" }}.svc.cluster.local:2379
+          - --data-dir=/var/lib/etcd
+          - --initial-advertise-peer-urls=https://{{ .Values.etcd.name | default "erda-etcd" }}.{{ .Values.global.namespace | default "erda-system" }}.svc.cluster.local:2380
+          - --initial-cluster={{ .Values.etcd.name | default "erda-etcd" }}=https://{{ .Values.etcd.name | default "erda-etcd" }}.{{ .Values.global.namespace | default "erda-system" }}.svc.cluster.local:2380
+          - --listen-client-urls=https://0.0.0.0:2379
+          - --listen-metrics-urls=https://0.0.0.0:2381
+          - --listen-peer-urls=https://0.0.0.0:2380
+          - --name={{ .Values.etcd.name | default "erda-etcd" }}
+          - --snapshot-count=10000
+          - --auto-compaction-retention=1
+          - --quota-backend-bytes=8589934592
+          - --client-cert-auth=true
+          - --trusted-ca-file=/etc/kubernetes/ssl/etcd-ca.pem
+          - --cert-file=/etc/kubernetes/ssl/etcd-server.pem
+          - --key-file=/etc/kubernetes/ssl/etcd-server-key.pem
+          - --peer-client-cert-auth=true
+          - --peer-trusted-ca-file=/etc/kubernetes/ssl/etcd-ca.pem
+          - --peer-cert-file=/etc/kubernetes/ssl/etcd-peer.pem
+          - --peer-key-file=/etc/kubernetes/ssl/etcd-peer-key.pem
+          ports:
+          - containerPort: 2379
+            name: client
+            protocol: TCP
+          - containerPort: 2380
+            name: server
+            protocol: TCP
+          resources:
+            limits:
+              cpu: "1"
+              memory: 2Gi
+            requests:
+              cpu: 100m
+              memory: 1Gi
+          volumeMounts:
+          - name: etcd-server-peer-secret
+            mountPath: /etc/kubernetes/ssl/
+            readOnly: true
+          - name: {{ .Values.etcd.name | default "erda-etcd" }}
+            mountPath: /var/lib/etcd
+      volumes:
+        - name: etcd-server-peer-secret
+          secret:
+            secretName: etcd-server-peer-secret
+  updateStrategy:
+    type: RollingUpdate
+  volumeClaimTemplates:
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      labels:
+        app: {{ .Values.etcd.name | default "erda-etcd" }}
+      name: {{ .Values.etcd.name | default "erda-etcd" }}
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 100Gi
+      storageClassName: {{ .Values.global.storageClassName | default "dice-local-volume" }}
+      volumeMode: Filesystem
+{{- end }}
