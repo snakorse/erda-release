@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Values.name | default "addon-kms" }}
+  name: erda-kms
   namespace: {{ .Values.global.namespace | default "erda-system" }}
   labels:
     app.kubernetes.io/name: kms
@@ -49,19 +49,22 @@ spec:
       {{- end }}
       containers:
         - name: kms
-          image: {{ .Values.global.image.repository }}/{{ .Values.name | default "addon-kms" }}:{{ .Values.version }}
+          image: {{ .Values.global.image.repository }}/addon-kms:{{ .Values.version }}
           imagePullPolicy: {{ .Values.global.image.imagePullPolicy }}
           ports:
             - containerPort: 3082
           env:
             - name: ETCD_ENDPOINTS
-              value: https://erda-etcd.{{ .Values.global.namespace}}.svc.cluster.local:2379
+              valueFrom:
+                configMapKeyRef:
+                  key: ETCD_ENDPOINTS
+                  name: dice-cluster-info
           resources:
             requests:
               cpu: {{ .Values.resources.requests.cpu | default "0.1" | quote }}
               memory: {{ .Values.resources.requests.memory | default "10Mi" | quote }}
             limits:
-              cpu: {{ .Values.resources.limits.cpu |  default ".5" | quote }}
+              cpu: {{ .Values.resources.limits.cpu |  default "0.5" | quote }}
               memory: {{ .Values.resources.limits.memory | default "500Mi" | quote }}
           livenessProbe:
             failureThreshold: 9

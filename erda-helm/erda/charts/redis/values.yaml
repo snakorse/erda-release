@@ -7,7 +7,6 @@ global:
   imagePullSecrets: [ ]
 
 redisOperator:
-  name: redis-operator
   version: 1.0.0-20200723-1a7a9f14
   resources:
     requests:
@@ -18,7 +17,6 @@ redisOperator:
       memory:
 
 redisFailover:
-  name: addon-redis
   version: 3.2.12
   secret: aUVWSUk2TFk2RWJyYzRIWA==
   redis:

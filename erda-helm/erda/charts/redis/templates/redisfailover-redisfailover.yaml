@@ -1,11 +1,11 @@
 apiVersion: databases.spotahome.com/v1
 kind: RedisFailover
 metadata:
-  name: {{ .Values.redisFailover.name | default "addon-redis" }}
+  name: erda-redis
   namespace: {{ .Values.global.namespace | default "erda-system" }}
 spec:
   sentinel:
-    image: {{ .Values.global.image.repository }}/{{ .Values.redisFailover.name | default "addon-redis" }}:{{ .Values.redisFailover.version }}
+    image: {{ .Values.global.image.repository }}/addon-redis:{{ .Values.redisFailover.version }}
     {{- if eq .Values.global.size "prod" }}
     replicas: {{ .Values.redisFailover.sentinel.replicas | default 3 }}
     {{- else }}
@@ -35,7 +35,7 @@ spec:
     - "down-after-milliseconds 12000"
     - "failover-timeout 12000"
   redis:
-    image: {{ .Values.global.image.repository }}/{{ .Values.redisFailover.name | default "addon-redis" }}:{{ .Values.redisFailover.version }}
+    image: {{ .Values.global.image.repository }}/addon-redis:{{ .Values.redisFailover.version }}
     {{- if eq .Values.global.size "prod" }}
     replicas: {{ .Values.redisFailover.redis.replicas | default 2 }}
     {{- else }}
@@ -62,4 +62,4 @@ spec:
         cpu: {{ .Values.redisFailover.redis.resources.requests.cpu | default ".3" | quote }}
         memory: {{ .Values.redisFailover.redis.resources.limits.memory | default "512Mi" | quote }}
   auth:
-    secretPath: {{ .Values.redisFailover.name | default "addon-redis" }}-auth
+    secretPath: erda-redis-auth

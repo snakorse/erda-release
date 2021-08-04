@@ -6,7 +6,6 @@ global:
     imagePullPolicy: IfNotPresent
   imagePullSecrets: [ ]
 
-name: addon-kms
 version: 1.0.0-20200608-f11445f
 replicas:
 resources:
@@ -16,5 +15,3 @@ resources:
   limits:
     cpu:
     memory:
-# TODO: register from values
-etcdEndpoints: https://erda-etcd.erda-system.svc.cluster.local:2379
