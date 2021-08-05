@@ -16,7 +16,7 @@ data:
   MYSQL_PASSWORD: {{ .Values.mysql.password }}
   MYSQL_PORT: "3306"
   MYSQL_USERNAME: {{ .Values.mysql.user }}
-  KMS_ADDR: {{ .Values.kms.name | default "addon-kms" }}.{{ .Values.global.namespace | default "erda-system"}}.svc.cluster.local:3082
+  KMS_ADDR: erda-kms.{{ .Values.global.namespace | default "erda-system"}}.svc.cluster.local:3082
   {{- if not .Values.nexus.custom.address }}
   NEXUS_ADDR: {{ .Values.nexus.defaultAddress }}
   {{- else }}
@@ -32,7 +32,7 @@ data:
   NEXUS_PUBLIC_URL: http://nexus-sys.{{ .Values.erda.domain }}
   REDIS_MASTER_NAME: mymaster
   REDIS_PASSWORD: iEVII6LY6Ebrc4HX
-  REDIS_SENTINELS_ADDR: rfs-{{ .Values.redis.redisFailover.name | default "addon-redis" }}.{{ .Values.global.namespace | default "erda-system"}}.svc.cluster.local:26379
+  REDIS_SENTINELS_ADDR: rfs-erda-redis.{{ .Values.global.namespace | default "erda-system"}}.svc.cluster.local:26379
   {{- if .Values.registry.custom.address }}
   REGISTRY_ADDR: {{ .Values.registry.custom.address }}
   {{- else }}

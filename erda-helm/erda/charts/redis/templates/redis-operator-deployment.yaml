@@ -2,14 +2,14 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: {{ .Values.redisOperator.name }}
-  name: {{ .Values.redisOperator.name }}
+    app: redis-operator
+  name: redis-operator
   namespace: {{ .Values.global.namespace | default "erda-system" }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: {{ .Values.redisOperator.name }}
+      app: redis-operator
   strategy:
     type: RollingUpdate
   template:
@@ -23,9 +23,9 @@ spec:
       imagePullSecrets:
       {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ .Values.redisOperator.name }}
+      serviceAccountName: redis-operator
       containers:
-        - image: {{ .Values.global.image.repository }}/{{ .Values.redisOperator.name }}:{{ .Values.redisOperator.version }}
+        - image: {{ .Values.global.image.repository }}/redis-pperator:{{ .Values.redisOperator.version }}
           imagePullPolicy: {{ .Values.global.image.imagePullPolicy }}
           name: app
           resources:

@@ -4,14 +4,45 @@ global:
   image:
     repository: registry.erda.cloud/erda
     imagePullPolicy: IfNotPresent
+  # Use this set to assign a list of default pullSecrets
   imagePullSecrets: [ ]
 # TODO: storage class in global control or not
 #  storageClass:
 #    local: dice-local-volume
 #    nfs: dice-nfs-volume
 
-# TODO: the ratio of request and limit with resources
-subscribeRatio: 1
+# TODO: add by lbl
+expose:
+   tls:
+     # Enable the tls or not.
+     enabled: true
+
+# The persistence is enabled by default and a default StorageClass
+# is needed in the k8s cluster to provision volumes dynamicly.
+# Specify another StorageClass in the "storageClass" or set "existingClaim"
+# if you have already existing persistent volumes to use
+persistence:
+  enabled: true
+  # Setting it to "keep" to avoid removing PVCs during a helm delete
+  # operation. Leaving it empty will delete PVCs after the chart deleted
+  # (this does not apply for PVCs that are created for internal database
+  # and redis components, i.e. they are never deleted automatically)
+  resourcePolicy: "keep"
+  persistentVolumeClaim:
+
+
+# The update strategy for deployments: "RollingUpdate" or "Recreate"
+# TODO：Set it as "Recreate" when "RWM" for volumes isn't supported
+updateStrategy:
+  type: RollingUpdate
+
+# debug, info, warning, error or fatal
+logLevel: info
+
+# TODO: Support custom account password
+# The initial password of Erda admin. Change it from portal after launching Harbor
+adminPassword: "password12345"
+# TODO: add by lbl
 
 tags:
   work: false
@@ -104,9 +135,8 @@ sonar:
     adminToken:
 
 kms:
-  name: addon-kms
   version: 1.0.0-20200608-f11445f
-  replicas:
+  replicas: 1
   resources:
     requests:
       cpu:
@@ -116,16 +146,16 @@ kms:
       memory:
   etcdEndpoints: https://erda-etcd.erda-system.svc.cluster.local:2379
 
-nexus:
-  defaultAddress: https://maven.aliyun.com/repository/public
-  custom:
-    address:
-    username:
-    password:
+
+#nexus:
+#  defaultAddress: https://maven.aliyun.com/repository/public
+#  custom:
+#    address:
+#    username:
+#    password:
 
 redis:
   redisOperator:
-    name: redis-operator
     version: 1.0.0-20200723-1a7a9f14
     resources:
       requests:
@@ -136,7 +166,6 @@ redis:
         memory:
 
   redisFailover:
-    name: addon-redis
     version: 3.2.12
     secret: aUVWSUk2TFk2RWJyYzRIWA==
     redis:

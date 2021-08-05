@@ -78,9 +78,8 @@ cassandra:
       memory:
 
 kms:
-  name: addon-kms
   version: 1.0.0-20200608-f11445f
-  replicas: 1
+  replicas:
   resources:
     requests:
       cpu:
