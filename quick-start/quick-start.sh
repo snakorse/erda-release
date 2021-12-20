@@ -153,7 +153,7 @@ EOABORT
 fi
 
 INSTALL_LOCATION="/opt/erda-quickstart"
-ERDA_VERSION="1.2.1"
+ERDA_VERSION="1.4.0"
 ERDA_RELEASE="https://static.erda.cloud/quick-start/$ERDA_VERSION/release.tar.gz"
 
 # shellcheck disable=SC2016
