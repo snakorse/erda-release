@@ -136,13 +136,6 @@ cd "/usr" || exit 1
 
 ######################################################script
 
-if ! command -v git >/dev/null; then
-    abort "$(cat <<EOABORT
-You must install Git before installing Erda.
-EOABORT
-)"
-fi
-
 if ! command -v docker >/dev/null; then
     abort "$(cat <<EOABORT
 You must install Docker before installing Erda.
