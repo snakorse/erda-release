@@ -6,12 +6,12 @@ if [[ "$OS" == "Darwin" ]]; then
 fi
 
 CONFIG="./variables"
-TEMPLATE="./templates/"
-DESTINATION="./dist"
+TEMPLATE="./templates/."
+DESTINATION="./dist/"
 SCRIPT_DESTINATION="$DESTINATION"
 
 mkdir -p "$DESTINATION"
-cp -r "$TEMPLATE" "$SCRIPT_DESTINATION"
+cp -r "$TEMPLATE" "$SCRIPT_DESTINATION" || exit 1
 
 while read -r line; do
   setting="$( echo "$line" | cut -d '=' -f 1 )"
