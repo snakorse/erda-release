@@ -152,8 +152,8 @@ EOABORT
 )"
 fi
 
-INSTALL_LOCATION="/opt/erda-quickstart"
-ERDA_VERSION="1.4.0"
+INSTALL_LOCATION="/opt/erda-quick-start"
+ERDA_VERSION="%ERDA_VERSION%"
 ERDA_RELEASE="https://static.erda.cloud/quick-start/$ERDA_VERSION/release.tar.gz"
 
 # shellcheck disable=SC2016
@@ -175,9 +175,9 @@ ohai "Start download Erda[${ERDA_VERSION}] to ${INSTALL_LOCATION}"
 
 ) || exit 1
 
-ohai "Start setup Erda using ${INSTALL_LOCATION}/quick-start/docker-compose.yml"
+ohai "Start setup Erda using ${INSTALL_LOCATION}/resources/docker-compose.yml"
 
-cd "${INSTALL_LOCATION}/quick-start" || exit 1
+cd "${INSTALL_LOCATION}/resources" || exit 1
 execute "docker-compose" "up" "-d" "mysql"
 sleep 10
 execute "docker-compose" "up" "--abort-on-container-exit" "--exit-code-from" "mysql-healthcheck" "mysql-healthcheck"
@@ -199,10 +199,9 @@ ohai "Setup local hosts"
   fi
 ) || exit 1
 
-ohai "Erda has been started successfully using ${INSTALL_LOCATION}/quick-start/docker-compose.yml"
+ohai "Erda has been started successfully using ${INSTALL_LOCATION}/resources/docker-compose.yml"
 
 ohai "Next steps:"
 echo "visit ${tty_underline}http://erda.local${tty_reset} to start your journey on Erda"
-echo "visit ${tty_underline}https://docs.erda.cloud/1.3/manual/install/docker-install.html${tty_reset} for FAQs if you encounter problems installing Erda"
 echo "visit ${tty_underline}https://docs.erda.cloud${tty_reset} for full introduction of Erda"
-echo "goto ${INSTALL_LOCATION}/quick-start/ dir to check and manage the docker-compose resources"
+echo "goto ${INSTALL_LOCATION}/resources/ dir to check and manage the docker-compose resources"
