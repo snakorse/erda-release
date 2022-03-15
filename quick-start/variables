@@ -1,4 +1,4 @@
-ERDA_VERSION=1.5.0
-UI_IMAGE=registry.erda.cloud/erda/ui-ce:1.5-beta-20220106164004-372cbb4
-ERDA_IMAGE=registry.erda.cloud/erda/erda:1.5-beta-20220106090210-aba3ce7
-MIGRATION_IMAGE=registry.erda.cloud/erda/init-image:1.5.0-20220106
+ERDA_VERSION=2.0.0
+UI_IMAGE=registry.erda.cloud/erda/ui-ce:2.0-beta-20220304100121-6a73078
+ERDA_IMAGE=registry.erda.cloud/erda/erda:2.0-20220304165510-49152b9
+MIGRATION_IMAGE=registry.erda.cloud/erda/init-image:2.0.0-20220302
