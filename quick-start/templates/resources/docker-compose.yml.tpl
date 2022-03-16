@@ -318,7 +318,6 @@ services:
     container_name: erda-msp
     depends_on:
       - elasticsearch
-      - cassandra
       - mysql
     env_file:
       - ./env
@@ -337,7 +336,6 @@ services:
       - redis-sentinel
       - redis
       - erda-migration
-      - scheduler
       - pipeline
       - gittar
       - core-services
@@ -364,7 +362,6 @@ services:
     container_name: erda-orchestrator
     depends_on:
       - erda-migration
-      - scheduler
       - collector
     env_file:
       - ./env
@@ -373,6 +370,7 @@ services:
       - TENANT_GROUP_KEY=58dcbf490ef3
     ports:
       - "8081"
+      - "7080"
     restart: always
     platform: linux/amd64
 
@@ -382,7 +380,7 @@ services:
     container_name: erda-pipeline
     depends_on:
       - erda-migration
-      - scheduler
+      - orchestrator
     env_file:
       - ./env
     environment:
@@ -390,25 +388,6 @@ services:
       - PIPELINE_STORAGE_URL=file:///devops/storage
     ports:
       - "3081"
-    restart: always
-    platform: linux/amd64
-
-  scheduler:
-    image: %ERDA_IMAGE%
-    command: /app/scheduler
-    container_name: erda-scheduler
-    depends_on:
-      - erda-migration
-      - etcd
-    env_file:
-      - ./env
-    environment:
-      - ENABLE_SPECIFIED_K8S_NAMESPACE=erda-system
-      - CMDB_CONTAINER_TOPIC=spot-metaserver_container
-      - CMDB_GROUP=spot_cmdb_group2
-      - DEBUG=false
-    ports:
-      - "9091"
     restart: always
     platform: linux/amd64
 
@@ -481,22 +460,6 @@ services:
         read_only: false
     depends_on:
       - zookeeper
-    restart: always
-    platform: linux/amd64
-
-  cassandra:
-    image: bitnami/cassandra:3-debian-10
-    container_name: erda-cassandra
-    environment:
-      CASSANDRA_USER: cassandra
-      CASSANDRA_PASSWORD: cassandra
-    volumes:
-      - type: volume
-        source: erda-cassandra
-        target: /bitnami
-        read_only: false
-    ports:
-      - "9042"
     restart: always
     platform: linux/amd64
 
@@ -611,7 +574,6 @@ volumes:
   erda-files: {}
   kratos-sqlite: {}
   erda-elasticsearch: {}
-  erda-cassandra: {}
   erda-kafka: {}
   erda-zookeeper: {}
 
