@@ -186,7 +186,6 @@ execute "docker-compose" "up" "--abort-on-container-exit" "--exit-code-from" "er
 execute "docker-compose" "up" "sysctl-init"
 execute "docker-compose" "up" "-d" "elasticsearch"
 
-execute "docker-compose" "up" "-d" "cassandra"
 execute "docker-compose" "up" "-d" "kafka"
 
 execute "docker-compose" "up" "-d"
